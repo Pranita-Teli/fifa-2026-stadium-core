@@ -8,6 +8,6 @@ An ultra-premium, mobile-first Single Page Application (SPA) designed to optimiz
 - **Multilingual Authentication Gateway**: Includes a secure login modal that immediately translates all application fields into English, Español, or Français based on user preference.
 
 ## 🛠️ Technology Stack
-- **Frontend Architecture**: Modern HTML5, Semantic JavaScript (ES6+)
-- **Design Framework**: Tailwind CSS v3 Layout Engine (Static Content Delivery Network)
-- **AI Workspace**: Google AntiGravity Workspace Core / Gemini 3.5 Flash Build Integration
+- **Frontend Architecture**: Modern HTML5, Semantic JavaScript (ES6+) [1]
+- **Design Framework**: Tailwind CSS v4 Engine (Modern Browser Play CDN Compilation) [1]
+- **AI Workspace**: Google AntiGravity Workspace Core / Gemini 3.5 Flash Build Integration [1]
