@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FIFA 2026 Stadium Core</title>
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style type="text/css">
+    @theme {
+      --font-sans: 'Outfit', sans-serif;
+      --color-stadium-dark: #020617;
+      --color-stadium-blue: #0f172a;
+      --color-stadium-blue-light: #1e3a8a;
+      --color-gold: #f59e0b;
+      --color-gold-hover: #d97706;
+      --color-pitch-green: #22c55e;
+      --color-sos-red: #ef4444;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #020617;
+      background-image: radial-gradient(circle at top left, #0f172a 0%, #020617 70%, #1e1b4b 100%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Screen Tab Transition Animation */
+    .panel-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .panel-view.active {
+      display: block;
+      animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Pulse effects */
+    .pulse-glow-red {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      animation: pulseRed 1.8s infinite;
+    }
+    @keyframes pulseRed {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+
+    .pulse-glow-green {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+      animation: pulseGreen 2.2s infinite;
+    }
+    @keyframes pulseGreen {
+      0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+      }
+      70% {
+        box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+      }
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex justify-center items-start md:items-center p-0 md:p-6 overflow-x-hidden">
+
+  <!-- ============================================== -->
+  <!-- MULTILINGUAL AUTH GATEWAY OVERLAY -->
+  <!-- ============================================== -->
+  <div id="gateway-overlay" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-slate-900 border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+      <!-- Background glow decorative circles -->
+      <div class="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+
+      <div class="text-center space-y-2 relative z-10">
+        <!-- Soccer ball trophy badge icon -->
+        <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/20 mb-2">
+          <svg class="w-7 h-7 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+          </svg>
+        </div>
+        <h2 id="gateway-title" class="text-2xl font-black tracking-tight bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 bg-clip-text text-transparent uppercase">
+          FIFA 2026 STADIUM CORE
+        </h2>
+        <p id="gateway-subtitle" class="text-xs text-slate-400 font-semibold leading-relaxed">
+          Access stadium telemetry, maps, tickets, and safety tools.
+        </p>
+      </div>
+
+      <!-- Language selector grid -->
+      <div class="space-y-3 relative z-10">
+        <label id="gateway-lang-label" class="text-[10px] font-black text-amber-500 uppercase tracking-widest block">
+          Select Language / Seleccionar Idioma / Choisir la Langue
+        </label>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="selectGatewayLanguage('en')" id="btn-lang-en" 
+                  class="bg-amber-500 text-slate-950 border border-amber-500 font-extrabold py-3.5 rounded-2xl text-xs transition-colors duration-200">
+            🇬🇧 English
+          </button>
+          <button onclick="selectGatewayLanguage('es')" id="btn-lang-es" 
+                  class="bg-slate-950 text-slate-400 border border-white/5 hover:border-white/10 font-bold py-3.5 rounded-2xl text-xs transition-colors duration-200">
+            🇪🇸 Español
+          </button>
+          <button onclick="selectGatewayLanguage('fr')" id="btn-lang-fr" 
+                  class="bg-slate-950 text-slate-400 border border-white/5 hover:border-white/10 font-bold py-3.5 rounded-2xl text-xs transition-colors duration-200">
+            🇫🇷 Français
+          </button>
+        </div>
+      </div>
+
+      <!-- Auth credentials -->
+      <div class="space-y-4 relative z-10 pt-2 border-t border-white/5">
+        <div class="space-y-2">
+          <label id="gateway-user-label" class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+            Fan Identity Credentials
+          </label>
+          <input type="text" id="fan-name-input" placeholder="Enter Fan Username..." value="Alex Johnson"
+                 class="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors">
+        </div>
+
+        <button onclick="submitFanAuth()" id="btn-sign-in"
+                class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-black py-4 rounded-2xl text-xs tracking-wider uppercase shadow-lg shadow-amber-500/10 active:scale-95 transition-all duration-200">
+          Sign In as Fan
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================== -->
+  <!-- MAIN MOBILE SHELL VIEWPORT -->
+  <!-- ============================================== -->
+  <div class="w-full max-w-md bg-slate-950/90 backdrop-blur-xl min-h-screen md:min-h-[850px] md:max-h-[900px] md:rounded-[36px] md:shadow-2xl border-0 md:border-4 md:border-slate-800/80 flex flex-col relative overflow-hidden transition-all duration-300">
+    
+    <!-- Sticky Top Header Navigation -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-white/10 px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+          <svg class="w-5 h-5 text-slate-950 font-extrabold" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold tracking-tight bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+            FIFA 2026
+          </h1>
+          <p class="text-[10px] text-slate-400 font-semibold tracking-wide uppercase">Stadium Core</p>
+        </div>
+      </div>
+      
+      <!-- Sticky Stadium Select Dropdown -->
+      <div>
+        <select id="stadium-selector" onchange="changeActiveStadium(this.value)"
+                class="bg-slate-950 border border-white/10 hover:border-white/20 rounded-xl px-2.5 py-1.5 text-xs text-white font-extrabold focus:outline-none transition-colors max-w-[150px]">
+          <option value="metlife">MetLife Stadium</option>
+          <option value="sofi">SoFi Stadium</option>
+          <option value="azteca">Estadio Azteca</option>
+        </select>
+      </div>
+    </header>
+
+
+    <!-- Main Scrollable Core Content Area -->
+    <main class="flex-1 overflow-y-auto px-5 pt-5 pb-8 space-y-6">
+
+      <!-- ============================================== -->
+      <!-- VIEW: DASHBOARD HOME (PhonePe 2x2 Grid) -->
+      <!-- ============================================== -->
+      <div id="panel-dashboard" class="panel-view active space-y-6">
+        
+        <!-- Welcome banner -->
+        <div class="p-5 rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 border border-indigo-500/10 shadow-lg relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-28 h-28 rounded-full bg-amber-500/10 blur-2xl pointer-events-none"></div>
+          <div class="space-y-1">
+            <span class="text-[9px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-1.5">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              FIFA Telemetry Link Active
+            </span>
+            <h2 class="text-xl font-black text-white leading-tight">
+              <span data-translate="hello_label">Welcome</span>, <span id="dashboard-fan-name" class="text-amber-400">Alex</span>!
+            </h2>
+            <p id="dashboard-stadium-desc" class="text-xs text-slate-400 pt-1 leading-relaxed">
+              MetLife Stadium (NY/NJ) • Coordinates: 40.8135, -74.0743
+            </p>
+          </div>
+        </div>
+
+        <!-- Utility 2x2 Grid (PhonePe style tiles) -->
+        <div class="space-y-3">
+          <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest" data-translate="utility_grid_title">STADIUM CONTROLS</h3>
+          <div class="grid grid-cols-2 gap-3.5">
+            
+            <!-- Grid item 1: Match Tickets -->
+            <button onclick="togglePanel('tickets')" 
+                    class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden">
+              <div class="text-2xl group-hover:scale-110 transition-transform duration-200">🎟️</div>
+              <div>
+                <h4 class="text-sm font-extrabold text-white leading-none" data-translate="ticket_hub_title">Match Tickets</h4>
+                <p id="dashboard-tickets-count" class="text-[10px] text-amber-500 font-bold mt-1">0 Tickets purchased</p>
+              </div>
+            </button>
+
+            <!-- Grid item 2: Stadium Routes -->
+            <button onclick="togglePanel('stadium')" 
+                    class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden">
+              <div class="text-2xl group-hover:scale-110 transition-transform duration-200">🏟️</div>
+              <div>
+                <h4 class="text-sm font-extrabold text-white leading-none" data-translate="stadium_routes_title">Stadium Routes</h4>
+                <p id="dashboard-fastest-gate" class="text-[10px] text-emerald-400 font-bold mt-1">Fastest: Gate C (4m)</p>
+              </div>
+            </button>
+
+            <!-- Grid item 3: Stays & Food -->
+            <button onclick="togglePanel('food-stay')" 
+                    class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden">
+              <div class="text-2xl group-hover:scale-110 transition-transform duration-200">🏨</div>
+              <div>
+                <h4 class="text-sm font-extrabold text-white leading-none" data-translate="stays_food_title">Stays & Food</h4>
+                <p id="dashboard-deals-count" class="text-[10px] text-slate-400 mt-1">10 listings near stadium</p>
+              </div>
+            </button>
+
+            <!-- Grid item 4: Personal Assistant -->
+            <button onclick="togglePanel('help')" 
+                    class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden">
+              <div class="text-2xl group-hover:scale-110 transition-transform duration-200">🤖</div>
+              <div>
+                <h4 class="text-sm font-extrabold text-white leading-none" data-translate="assistant_title">AI Concierge</h4>
+                <p class="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span> Online
+                </p>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- EMERGENCY SOS ACTION ROW AT BOTTOM OF HOME -->
+        <div class="bg-rose-950/20 border border-rose-500/20 rounded-3xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🚨</span>
+            <div>
+              <h4 class="text-xs font-black text-rose-400 uppercase tracking-wide" data-translate="emergency_sos">EMERGENCY SOS</h4>
+              <p class="text-[10px] text-slate-400 leading-tight" data-translate="emergency_shortcut_desc">Tap to broadcast safety coordinates</p>
+            </div>
+          </div>
+          <button onclick="togglePanel('sos')" 
+                  class="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all duration-200 active:scale-95">
+            Activate
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PANEL VIEW: 🎟️ MATCH TICKETS & LEDGER -->
+      <!-- ============================================== -->
+      <div id="panel-tickets" class="panel-view space-y-6">
+        
+        <!-- HEADER & BACK -->
+        <div class="flex justify-between items-center">
+          <button onclick="showDashboardHome()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl">
+            <span data-translate="back_to_dashboard">← Back to Dashboard</span>
+          </button>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20" data-translate="current_match_ticket">
+            🎟️ Current Match Ticket
+          </span>
+        </div>
+
+        <!-- DIGITAL TICKETS CARD (With live score telemetry) -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 text-slate-950 p-6 shadow-xl shadow-amber-500/10 border border-amber-400/30">
+          
+          <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50%" cy="50%" r="50" stroke="white" stroke-width="4" fill="none"/>
+              <line x1="0" y1="50%" x2="100%" y2="50%" stroke="white" stroke-width="4"/>
+            </svg>
+          </div>
+
+          <!-- Header info on ticket -->
+          <div class="flex justify-between items-start border-b border-slate-950/20 pb-4 relative z-10">
+            <div>
+              <p class="text-[9px] font-black tracking-widest text-slate-900/70 uppercase">FIFA WORLD CUP 2026</p>
+              <h3 id="ticket-match-id" class="text-xl font-black tracking-tight leading-none mt-1">MATCH 14</h3>
+              <p id="ticket-match-teams" class="text-lg font-extrabold text-slate-950 leading-tight">USA vs GERMANY</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] font-black bg-slate-950 text-amber-400 px-2 py-0.5 rounded-md uppercase">
+                GROUP STAGE
+              </span>
+              <!-- LIVE TIMER / SCORE TELEMETRY -->
+              <div class="mt-2 text-right">
+                <span id="ticket-live-score" class="text-sm font-black bg-slate-900 text-white px-2 py-0.5 rounded mr-1">USA 2 - 1 GER</span>
+                <span id="ticket-live-time" class="text-[10px] font-black text-rose-600 bg-rose-500/15 px-1.5 py-0.5 rounded animate-pulse">78:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ticket details & QR Code -->
+          <div class="grid grid-cols-5 gap-4 pt-4 items-center relative z-10">
+            
+            <!-- Left details -->
+            <div class="col-span-3 space-y-3">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="gate">GATE</p>
+                  <p id="ticket-gate" class="text-xs font-black text-slate-950">GATE C</p>
+                </div>
+                <div>
+                  <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="section">SECTION</p>
+                  <p id="ticket-section" class="text-xs font-black text-slate-950">SEC 120</p>
+                </div>
+                <div>
+                  <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="row">ROW</p>
+                  <p id="ticket-row" class="text-xs font-black text-slate-950">ROW K</p>
+                </div>
+                <div>
+                  <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="seat">SEAT</p>
+                  <p id="ticket-seat" class="text-xs font-black text-slate-950">SEAT 12</p>
+                </div>
+              </div>
+
+              <div class="pt-1.5">
+                <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="stadium_entry_time">STADIUM ENTRY TIME</p>
+                <p class="text-[10px] font-black text-slate-950">17:30 EST (Kickoff: 20:00)</p>
+              </div>
+            </div>
+
+            <!-- Right QR code -->
+            <div class="col-span-2 flex flex-col items-center justify-center">
+              <div class="bg-white p-2 rounded-2xl shadow-md">
+                <svg class="w-18 h-18 text-slate-950" viewBox="0 0 100 100" fill="currentColor">
+                  <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z" />
+                  <path d="M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z" />
+                  <path d="M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z" />
+                  <path d="M40,10 h10 v10 h-10 z M50,0 h10 v10 h-10 z" />
+                  <path d="M80,40 h10 v10 h-10 z M90,50 h10 v10 h-10 z" />
+                  <path d="M40,80 h10 v10 h-10 z M60,70 h10 v20 h-10 z" />
+                  <path d="M40,40 h20 v20 h-20 z M45,45 h10 v10 h-10 z" />
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- MY ACTIVE PURCHASES LEDGER -->
+        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 space-y-4">
+          <div class="flex justify-between items-center border-b border-white/5 pb-3">
+            <h3 class="text-sm font-black text-white uppercase tracking-wider" data-translate="active_ledger">My Active Ledger</h3>
+            <span id="ledger-count-badge" class="bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+              Purchased: 0
+            </span>
+          </div>
+
+          <!-- Itemized ledger rows -->
+          <div id="ledger-rows-container" class="space-y-2 max-h-40 overflow-y-auto text-xs text-slate-400">
+            <p class="text-center py-4" id="ledger-empty-text" data-translate="no_tickets_yet">No tickets purchased yet. Book tickets below!</p>
+          </div>
+        </div>
+
+        <!-- BOOK UPCOMING MATCHES -->
+        <div class="space-y-3.5">
+          <h3 class="text-base font-extrabold text-white tracking-tight" data-translate="upcoming_matches">Book Upcoming Matches</h3>
+          <div id="matches-list-container" class="space-y-3">
+            <!-- Dynamic Matches -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PANEL VIEW: 🏟️ SMART STADIUM & WAYFINDING -->
+      <!-- ============================================== -->
+      <div id="panel-stadium" class="panel-view space-y-6">
+        
+        <!-- HEADER & BACK -->
+        <div class="flex justify-between items-center">
+          <button onclick="showDashboardHome()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl">
+            <span data-translate="back_to_dashboard">← Back to Dashboard</span>
+          </button>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20" data-translate="wayfinding_queues">
+            🏟️ Live Wayfinding & Queues
+          </span>
+        </div>
+
+        <!-- ROUTING FINDER PANEL -->
+        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 space-y-4">
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-200" data-translate="seat_section_finder">Seat Section Finder</h3>
+            <p class="text-[11px] text-slate-400" data-translate="seat_section_desc">Instantly generate the fastest gate route to avoid heavy lines.</p>
+          </div>
+          
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <input type="text" id="seat-section-input" placeholder="Type your section (e.g. 105)" 
+                     class="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-colors">
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs">🚶‍♂️</span>
+            </div>
+            <button onclick="calculateRoute()" 
+                    class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-5 py-3.5 rounded-2xl text-xs transition-all duration-200 active:scale-95 shadow-md shadow-amber-500/10" data-translate="find_route">
+              Find Route
+            </button>
+          </div>
+
+          <!-- Generated steps output -->
+          <div id="route-output-container" class="hidden animate-fade-in-up">
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-950 to-slate-900 border border-amber-500/20 space-y-3">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <span class="text-[10px] font-black text-amber-400 flex items-center gap-1.5">
+                  ⚡ COMPANION GPS ROUTE
+                </span>
+                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-black">
+                  ACTIVE
+                </span>
+              </div>
+              <div id="route-steps" class="space-y-3.5 text-xs text-slate-200">
+                <!-- JS Populated steps -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUEUE PROGRESS INDICATORS -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-black text-white uppercase tracking-wider" data-translate="live_queue_status">Live Queue Status</h3>
+            <span class="text-[10px] text-slate-500 font-semibold uppercase" data-translate="sensor_feeds">Real-Time Sensor Feeds</span>
+          </div>
+
+          <!-- Fastest zone dynamic recommendation card -->
+          <div id="smart-alert-card" class="bg-gradient-to-r from-emerald-500/10 via-slate-900 to-slate-900 border border-emerald-500/20 rounded-2xl p-4 flex gap-3.5 items-center">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-lg shadow-inner pulse-glow-green shrink-0">
+              💡
+            </div>
+            <div>
+              <h4 class="text-xs font-extrabold text-emerald-400 uppercase tracking-wider" data-translate="fastest_entry">Fastest Entry Recommended</h4>
+              <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed" id="smart-alert-text">
+                Live recommendation analytics processing...
+              </p>
+            </div>
+          </div>
+
+          <!-- Bars container -->
+          <div id="queue-bars-container" class="space-y-3">
+            <!-- Dynamic queue wait indicators -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PANEL VIEW: 🏨 STAYS & FOOD (occupancies & map link) -->
+      <!-- ============================================== -->
+      <div id="panel-food-stay" class="panel-view space-y-6">
+        
+        <!-- HEADER & BACK -->
+        <div class="flex justify-between items-center">
+          <button onclick="showDashboardHome()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl">
+            <span data-translate="back_to_dashboard">← Back to Dashboard</span>
+          </button>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-indigo-500 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20" data-translate="stadium_guide">
+            🍔 Hostels, Dining & Suites
+          </span>
+        </div>
+
+        <!-- Dynamic external Maps Router link widget -->
+        <div class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 flex flex-col items-center gap-4 text-center">
+          <div>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider" data-translate="open_gmaps">GPS Outbound Navigation</h3>
+            <p id="stadium-gps-badge" class="text-[10px] text-slate-400 mt-1">MetLife (Lat: 40.8135, Lng: -74.0743)</p>
+          </div>
+          <a id="outbound-gmaps-link" target="_blank" href="https://www.google.com/maps"
+             class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-6 py-3 rounded-2xl text-xs flex items-center gap-2 shadow-lg shadow-blue-500/10 active:scale-95 transition-all duration-200 select-none">
+            <span>🗺️</span> <span data-translate="open_gmaps">Open Google Maps Route</span>
+          </a>
+        </div>
+
+        <!-- FILTER CONTROLS -->
+        <div class="flex items-center p-1 bg-slate-900/60 border border-white/5 rounded-2xl gap-1">
+          <button onclick="filterVenues('all')" id="btn-filter-all"
+                  class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-amber-500 text-slate-950">
+            All Listings
+          </button>
+          <button onclick="filterVenues('budget')" id="btn-filter-budget"
+                  class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-400 hover:text-slate-100">
+            Budget ($)
+          </button>
+          <button onclick="filterVenues('luxury')" id="btn-filter-luxury"
+                  class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-400 hover:text-slate-100">
+            Luxury ($$$)
+          </button>
+        </div>
+
+        <!-- Dynamic Venues lists -->
+        <div id="venues-list" class="space-y-3">
+          <!-- Dynamic rendering -->
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PANEL VIEW: 🤖 MULTILINGUAL AI CONCIERGE -->
+      <!-- ============================================== -->
+      <div id="panel-help" class="panel-view space-y-6">
+        
+        <!-- HEADER & BACK -->
+        <div class="flex justify-between items-center">
+          <button onclick="showDashboardHome()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl">
+            <span data-translate="back_to_dashboard">← Back to Dashboard</span>
+          </button>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20" data-translate="assistance_hub">
+            🚨 Assistance Hub
+          </span>
+        </div>
+
+        <!-- AI CHAT TERMINAL PANEL -->
+        <div class="bg-slate-900/60 border border-white/5 rounded-3xl flex flex-col overflow-hidden shadow-lg">
+          
+          <div class="bg-slate-900 px-4 py-3.5 border-b border-white/5 flex items-center gap-2">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <div>
+              <h3 id="ai-concierge-title" class="text-xs font-extrabold text-white">FIFA 2026 Multilingual Concierge Guide</h3>
+              <p id="ai-concierge-subtitle" class="text-[9px] text-slate-400">Offline & Online queries • Instantly responsive</p>
+            </div>
+          </div>
+
+          <!-- Chat logs container -->
+          <div id="chat-messages-container" class="h-[280px] overflow-y-auto p-4 space-y-3 flex flex-col bg-slate-950/30">
+            <!-- welcome prompt -->
+          </div>
+
+          <!-- message input bar -->
+          <div class="p-3 bg-slate-900 border-t border-white/5 flex gap-2">
+            <input type="text" id="chat-user-input" placeholder="Type a question (e.g. bag policy)..." 
+                   onkeydown="handleChatKeyDown(event)"
+                   class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50">
+            <button onclick="sendChatMessage()"
+                    class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 rounded-xl text-xs flex items-center justify-center transition-all duration-200 active:scale-95" data-translate="chat_send">
+              Send
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PANEL VIEW: 🚨 SOS INDEPENDENT EMERGENCY MATRIX -->
+      <!-- ============================================== -->
+      <div id="panel-sos" class="panel-view space-y-6">
+        
+        <!-- HEADER & BACK -->
+        <div class="flex justify-between items-center">
+          <button onclick="showDashboardHome()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl">
+            <span data-translate="back_to_dashboard">← Back to Dashboard</span>
+          </button>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-red-500 bg-red-500/10 px-2.5 py-1 rounded-full border border-red-500/20">
+            🚨 SOS Matrix
+          </span>
+        </div>
+
+        <div class="bg-rose-950/20 border border-rose-500/20 rounded-3xl p-6 flex flex-col items-center text-center space-y-5">
+          <div class="space-y-1.5">
+            <h3 class="text-sm font-black text-rose-400 uppercase tracking-widest" data-translate="emergency_sos">⚠️ EMERGENCY SOS DIRECT LINE</h3>
+            <p class="text-[11px] text-slate-300 leading-normal" data-translate="emergency_desc">
+              Press the button below only if you require immediate medical, security, or safety personnel assistance. Your location telemetry will broadcast automatically.
+            </p>
+          </div>
+
+          <!-- Pulsing high-intensity Red SOS Button -->
+          <button onclick="triggerSOSPanic()"
+                  class="w-36 h-36 rounded-full bg-gradient-to-br from-rose-500 via-red-600 to-rose-700 hover:from-rose-600 hover:to-red-800 text-white font-extrabold flex flex-col items-center justify-center shadow-lg shadow-rose-950 border-4 border-rose-400/40 cursor-pointer transition-transform duration-200 active:scale-90 select-none group pulse-glow-red">
+            <span class="text-3xl group-hover:scale-110 transition-transform duration-200">🚨</span>
+            <span class="text-base font-black tracking-tighter mt-1" data-translate="sos_panic">SOS PANIC</span>
+            <span class="text-[8px] text-rose-200 tracking-wider" data-translate="press_now">PRESS NOW</span>
+          </button>
+
+          <div class="text-[10px] text-slate-400 space-y-0.5">
+            <p><span data-translate="broadcast_coordinates">Current Broadcast coordinates</span>:</p>
+            <p id="sos-coord-badge" class="font-extrabold text-amber-500">Sec 120, Row K (MetLife Stadium)</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- ============================================== -->
+  <!-- MODALS AND FULLSCREEN OVERLAYS -->
+  <!-- ============================================== -->
+
+  <!-- 1. TICKET BOOKING SUCCESS CONFIRMATION MODAL -->
+  <div id="booking-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-white/10 w-full max-w-sm rounded-3xl p-6 text-center space-y-5 animate-scale-up">
+      
+      <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-3xl flex items-center justify-center mx-auto shadow-inner pulse-glow-green">
+        ✓
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="text-xl font-extrabold text-white" data-translate="booking_confirmed">Booking Confirmed!</h4>
+        <p class="text-xs text-slate-400" data-translate="booking_confirmed_desc">Your seat reservation details have been successfully synchronized to your FIFA App Account.</p>
+      </div>
+
+      <!-- Ticket invoice metadata ledger details -->
+      <div class="bg-slate-950 border border-white/5 p-4 rounded-2xl text-left space-y-2 text-xs">
+        <div class="flex justify-between items-center text-[10px]">
+          <span class="font-bold text-slate-400" data-translate="match_resv">MATCH RESV</span>
+          <span class="bg-amber-500 text-slate-950 font-black px-1.5 py-0.5 rounded" id="modal-match-id">MATCH #</span>
+        </div>
+        <p class="text-sm font-black text-white" id="modal-match-teams">Teams Display</p>
+        <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-white/5">
+          <div>
+            <p class="text-[9px] text-slate-500" data-translate="date_gate">DATE & GATE</p>
+            <p class="font-bold text-slate-300" id="modal-match-date">Date info</p>
+          </div>
+          <div>
+            <p class="text-[9px] text-slate-500" data-translate="paid_total">PAID TOTAL</p>
+            <p class="font-bold text-emerald-400" id="modal-match-price">$0.00</p>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeBookingModal()" 
+              class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3.5 rounded-2xl text-xs uppercase transition-colors duration-200" data-translate="got_it">
+        Got it, view Pass
+      </button>
+    </div>
+  </div>
+
+
+  <!-- 2. FULLSCREEN SOS ALARM TELEMETRY & BEACON DISPATCH OVERLAY -->
+  <div id="sos-overlay" class="hidden fixed inset-0 z-50 bg-rose-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center select-none">
+    
+    <div class="relative flex items-center justify-center mb-6">
+      <span class="animate-ping absolute inline-flex h-24 w-24 rounded-full bg-red-400 opacity-40"></span>
+      <div class="w-20 h-20 rounded-full bg-red-600 border border-rose-400 text-white text-4xl flex items-center justify-center shadow-lg">
+        🚨
+      </div>
+    </div>
+
+    <div class="space-y-3.5 max-w-xs">
+      <h4 class="text-2xl font-black text-white uppercase tracking-wider" data-translate="sos_signal_activated">EMERGENCY SOS SIGNAL ACTIVATED</h4>
+      <p class="text-xs text-red-200 leading-relaxed font-bold" data-translate="sos_dispatch_desc">
+        Security and medical coordinators are en route to your exact location coordinate:
+      </p>
+      
+      <!-- Coordinate Metrics panel -->
+      <div class="bg-white/10 border border-white/20 p-4 rounded-2xl space-y-2">
+        <div>
+          <p class="text-[9px] text-red-300 tracking-widest font-extrabold uppercase" data-translate="user_seat_metrics">USER SEAT METRICS</p>
+          <p id="sos-overlay-seat" class="text-2xl font-black text-white tracking-tight mt-0.5">SEC 120, ROW K, SEAT 12</p>
+          <p id="sos-overlay-stadium" class="text-[11px] text-amber-400 font-extrabold">METLIFE STADIUM • GATE C</p>
+        </div>
+        
+        <!-- Live device diagnostic metrics telemetry -->
+        <div class="pt-2 border-t border-white/10 grid grid-cols-2 gap-2 text-[9px] text-left text-slate-300">
+          <div>
+            <span class="text-slate-400 uppercase">GPS Precision:</span>
+            <span class="font-extrabold text-emerald-400 block">+/- 3.2 meters</span>
+          </div>
+          <div>
+            <span class="text-slate-400 uppercase">Signal Power:</span>
+            <span class="font-extrabold text-emerald-400 block">5G (96% RSSI)</span>
+          </div>
+          <div>
+            <span class="text-slate-400 uppercase">Battery Level:</span>
+            <span class="font-extrabold text-white block">84% Capacity</span>
+          </div>
+          <div>
+            <span class="text-slate-400 uppercase">Sensors Link:</span>
+            <span class="font-extrabold text-white block">Biometric Hub Active</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-[11px] text-red-300 animate-pulse font-semibold" data-translate="do_not_move">
+        Do not move. Staff has dispatched to your beacon.
+      </p>
+    </div>
+
+    <div class="mt-8 space-y-3.5 w-full max-w-xs">
+      <button onclick="cancelSOSPanic()" 
+              class="w-full bg-white text-slate-950 hover:bg-slate-200 font-extrabold py-4 rounded-2xl text-xs tracking-wider uppercase transition-colors" data-translate="cancel_alarm">
+        ❌ CANCEL ALARM (ACCIDENT)
+      </button>
+      <p class="text-[9px] text-red-400 font-semibold" data-translate="security_dispatch_log">
+        Security dispatch logs ID: WC26-4493-STAD
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT GLOBAL ARCHITECT & CONTROLLER -->
+  <!-- ============================================== -->
+  <script>
+    // ----------------------------------------------------
+    // 1. GLOBAL ARCHITECTURE VARIABLES
+    // ----------------------------------------------------
+    let currentLanguage = 'en';
+    let currentUserName = 'Alex Johnson';
+    let activeStadiumKey = 'metlife';
+    let purchasedTicketsCount = 0;
+
+    // ----------------------------------------------------
+    // 2. COMPREHENSIVE MULTI-STADIUM SYNTHETIC ENGINE
+    // ----------------------------------------------------
+    const stadiumsDatabase = {
+      metlife: {
+        name: "MetLife Stadium (NY/NJ)",
+        coords: { lat: 40.8135, lng: -74.0743 },
+        seat: { section: "SEC 120", row: "ROW K", seat: "SEAT 12" },
+        liveMatch: {
+          id: 14,
+          teamA: "USA",
+          teamB: "GER",
+          flagA: "🇺🇸",
+          flagB: "🇩🇪",
+          scoreA: 2,
+          scoreB: 1,
+          timeMin: 78,
+          timeSec: 0,
+          gate: "Gate C"
+        },
+        matches: [
+          { id: 14, teamA: "USA", teamB: "GERMANY", flagA: "🇺🇸", flagB: "🇩🇪", date: "June 18, 2026", time: "20:00 EST", price: 150, gate: "Gate C" },
+          { id: 28, teamA: "ARGENTINA", teamB: "SPAIN", flagA: "🇦🇷", flagB: "🇪🇸", date: "June 26, 2026", time: "21:00 EST", price: 280, gate: "Gate B" },
+          { id: 31, teamA: "ITALY", teamB: "JAPAN", flagA: "🇮🇹", flagB: "🇯🇵", date: "June 30, 2026", time: "18:30 EST", price: 160, gate: "Gate A" }
+        ],
+        hotels: [
+          { id: 'ml-h1', name: "Hampton Inn Meadowlands", price: 160, distance: 1.2, vacancies: 12, maxVacancies: 15, icon: "🏨", desc: "Walking distance to MetLife gate entrances" },
+          { id: 'ml-h2', name: "Meadowlands Plaza Hotel", price: 210, distance: 2.0, vacancies: 0, maxVacancies: 10, icon: "🏢", desc: "Rooftop lounge overlooking stadium plaza" }
+        ],
+        queues: [
+          { name: "Gate A (East Gate Entry)", waitTime: 28 },
+          { name: "Gate B (West Gate Entry)", waitTime: 14 },
+          { name: "Gate C (North Gate Entry)", waitTime: 4 },
+          { name: "Main Concourse Food Court", waitTime: 18 },
+          { name: "Section 120 Restrooms", waitTime: 8 }
+        ]
+      },
+      sofi: {
+        name: "SoFi Stadium (Los Angeles)",
+        coords: { lat: 33.9534, lng: -118.3392 },
+        seat: { section: "SEC 102", row: "ROW B", seat: "SEAT 4" },
+        liveMatch: {
+          id: 3,
+          teamA: "MEX",
+          teamB: "ITA",
+          flagA: "🇲🇽",
+          flagB: "🇮🇹",
+          scoreA: 0,
+          scoreB: 0,
+          timeMin: 23,
+          timeSec: 0,
+          gate: "Gate A"
+        },
+        matches: [
+          { id: 3, teamA: "MEXICO", teamB: "ITALY", flagA: "🇲🇽", flagB: "🇮🇹", date: "June 14, 2026", time: "17:00 PST", price: 190, gate: "Gate A" },
+          { id: 42, teamA: "BRAZIL", teamB: "JAPAN", flagA: "🇧🇷", flagB: "🇯🇵", date: "July 01, 2026", time: "19:30 PST", price: 310, gate: "Gate D" },
+          { id: 48, teamA: "USA", teamB: "ENGLAND", flagA: "🇺🇸", flagB: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", date: "July 04, 2026", time: "20:00 PST", price: 420, gate: "Gate C" }
+        ],
+        hotels: [
+          { id: 'sf-h1', name: "Sofi Luxury Suites", price: 240, distance: 0.8, vacancies: 8, maxVacancies: 10, icon: "🏨", desc: "Pre-game terrace party with direct ticket link" },
+          { id: 'sf-h2', name: "Hollywood Motel Hub", price: 95, distance: 3.1, vacancies: 0, maxVacancies: 8, icon: "🏘️", desc: "Affordable shared shuttle lines to the gates" }
+        ],
+        queues: [
+          { name: "Gate A (South Entry)", waitTime: 6 },
+          { name: "Gate B (VIP Main Entry)", waitTime: 22 },
+          { name: "Gate C (North Entry)", waitTime: 12 },
+          { name: "Gridiron Grills Plaza", waitTime: 25 },
+          { name: "Lower Concourse Restrooms", waitTime: 10 }
+        ]
+      },
+      azteca: {
+        name: "Estadio Azteca (Mexico City)",
+        coords: { lat: 19.3030, lng: -99.1505 },
+        seat: { section: "SEC 302", row: "ROW H", seat: "SEAT 18" },
+        liveMatch: {
+          id: 1,
+          teamA: "MEX",
+          teamB: "CAN",
+          flagA: "🇲🇽",
+          flagB: "🇨🇦",
+          scoreA: 1,
+          scoreB: 0,
+          timeMin: 48,
+          timeSec: 0,
+          gate: "Gate 1"
+        },
+        matches: [
+          { id: 1, teamA: "MEXICO", teamB: "CANADA", flagA: "🇲🇽", flagB: "🇨🇦", date: "June 11, 2026", time: "16:00 CST", price: 90, gate: "Gate 1" },
+          { id: 19, teamA: "FRANCE", teamB: "MOROCCO", flagA: "🇫🇷", flagB: "🇲🇦", date: "June 20, 2026", time: "19:00 CST", price: 220, gate: "Gate 3" },
+          { id: 25, teamA: "SPAIN", teamB: "URUGUAY", flagA: "🇪🇸", flagB: "🇺🇾", date: "June 24, 2026", time: "20:30 CST", price: 150, gate: "Gate 2" }
+        ],
+        hotels: [
+          { id: 'az-h1', name: "Gran Hotel Azteca", price: 110, distance: 0.5, vacancies: 15, maxVacancies: 20, icon: "🏨", desc: "Authentic Mexican buffet dinner, adjacent to portals" },
+          { id: 'az-h2', name: "Cozy Coyoacán Inn", price: 50, distance: 2.4, vacancies: 4, maxVacancies: 6, icon: "🏡", desc: "Charming traditional suites in Coyoacán district" }
+        ],
+        queues: [
+          { name: "Gate 1 (Avenida Entry)", waitTime: 32 },
+          { name: "Gate 2 (Metro Rail Entry)", waitTime: 18 },
+          { name: "Gate 3 (VIP West)", waitTime: 5 },
+          { name: "Cantina Azteca Plaza", waitTime: 11 },
+          { name: "Portal 300 Restrooms", waitTime: 7 }
+        ]
+      }
+    };
+
+    // ----------------------------------------------------
+    // 3. TRANSLATIONS SYSTEM ENGINE
+    // ----------------------------------------------------
+    const translations = {
+      en: {
+        hello_label: "Welcome",
+        gateway_title: "FIFA 2026 STADIUM CORE",
+        gateway_subtitle: "Access stadium telemetry, maps, tickets, and safety tools.",
+        sign_in: "Sign In as Fan",
+        current_match_ticket: "🎟️ Current Match Ticket",
+        gate: "GATE",
+        section: "SECTION",
+        row: "ROW",
+        seat: "SEAT",
+        stadium_entry_time: "STADIUM ENTRY TIME",
+        active_ledger: "My Active Ledger",
+        no_tickets_yet: "No tickets purchased yet. Book tickets below!",
+        upcoming_matches: "Book Upcoming Matches",
+        wayfinding_queues: "🏟️ Live Wayfinding & Queues",
+        seat_section_finder: "Seat Section Finder",
+        seat_section_desc: "Instantly generate the fastest gate route to avoid heavy lines.",
+        find_route: "Find Route",
+        live_queue_status: "Live Queue Status",
+        sensor_feeds: "Real-Time Sensor Feeds",
+        fastest_entry: "Fastest Entry Recommended",
+        stadium_guide: "🍔 Hostels, Dining & Suites",
+        open_gmaps: "Open Google Maps Route",
+        back_to_dashboard: "← Back to Dashboard",
+        emergency_sos: "⚠️ EMERGENCY SOS DIRECT LINE",
+        emergency_desc: "Press the button below only if you require immediate medical, security, or safety personnel assistance. Your location telemetry will broadcast automatically.",
+        sos_panic: "SOS PANIC",
+        press_now: "PRESS NOW",
+        broadcast_coordinates: "Current Broadcast coordinates",
+        booking_confirmed: "Booking Confirmed!",
+        booking_confirmed_desc: "Your seat reservation details have been successfully synchronized to your FIFA App Account.",
+        match_resv: "MATCH RESV",
+        date_gate: "DATE & GATE",
+        paid_total: "PAID TOTAL",
+        got_it: "Got it, view Pass",
+        sos_signal_activated: "EMERGENCY SOS SIGNAL ACTIVATED",
+        sos_dispatch_desc: "Security and medical coordinators are en route to your exact location coordinate:",
+        user_seat_metrics: "USER SEAT METRICS",
+        do_not_move: "Do not move. Staff has dispatched to your beacon.",
+        cancel_alarm: "❌ CANCEL ALARM (ACCIDENT)",
+        security_dispatch_log: "Security dispatch logs ID: WC26-4493-STAD",
+        utility_grid_title: "STADIUM CONTROLS",
+        ticket_hub_title: "Match Tickets",
+        stadium_routes_title: "Stadium Routes",
+        stays_food_title: "Stays & Food",
+        assistant_title: "AI Concierge",
+        emergency_shortcut_desc: "Tap to broadcast safety coordinates",
+        chat_send: "Send"
+      },
+      es: {
+        hello_label: "Bienvenido",
+        gateway_title: "NÚCLEO DEL ESTADIO FIFA 2026",
+        gateway_subtitle: "Acceda a telemetría del estadio, mapas, boletos y herramientas de seguridad.",
+        sign_in: "Iniciar sesión como Fan",
+        current_match_ticket: "🎟️ Boleto de Partido Actual",
+        gate: "PUERTA",
+        section: "SECCIÓN",
+        row: "FILA",
+        seat: "ASIENTO",
+        stadium_entry_time: "HORA DE ENTRADA AL ESTADIO",
+        active_ledger: "Mi Registro Activo",
+        no_tickets_yet: "Aún no hay boletos comprados. ¡Reserve abajo!",
+        upcoming_matches: "Reservar Próximos Partidos",
+        wayfinding_queues: "🏟️ Orientación y Colas en Vivo",
+        seat_section_finder: "Buscador de Sección de Asientos",
+        seat_section_desc: "Genere instantáneamente la ruta más rápida para evitar colas pesadas.",
+        find_route: "Buscar Ruta",
+        live_queue_status: "Estado de Colas en Vivo",
+        sensor_feeds: "Transmisiones de Sensores en Tiempo Real",
+        fastest_entry: "Entrada Más Rápida Recomendada",
+        stadium_guide: "🍔 Hostales, Cenas y Suites",
+        open_gmaps: "Abrir Ruta en Google Maps",
+        back_to_dashboard: "← Volver al Tablero",
+        emergency_sos: "⚠️ LÍNEA DIRECTA DE EMERGENCIA SOS",
+        emergency_desc: "Presione el botón de abajo solo si necesita asistencia médica, de seguridad o de personal de seguridad inmediata. Su telemetría se transmitirá automáticamente.",
+        sos_panic: "SOS PÁNICO",
+        press_now: "PRESIONAR AHORA",
+        broadcast_coordinates: "Coordenadas de transmisión actuales",
+        booking_confirmed: "¡Reserva Confirmada!",
+        booking_confirmed_desc: "Los detalles de su reserva de asiento se han sincronizado correctamente con su cuenta de la aplicación FIFA.",
+        match_resv: "RESV DE PARTIDO",
+        date_gate: "FECHA Y PUERTA",
+        paid_total: "TOTAL PAGADO",
+        got_it: "Entendido, ver Pase",
+        sos_signal_activated: "SEÑAL DE EMERGENCIA SOS ACTIVADA",
+        sos_dispatch_desc: "Los coordinadores médicos y de seguridad están en camino a sus coordenadas exactas:",
+        user_seat_metrics: "MÉTRICAS DE ASIENTO DE USUARIO",
+        do_not_move: "No se mueva. El personal ha sido enviado a su baliza.",
+        cancel_alarm: "❌ CANCELAR ALARMA (ACCIDENTE)",
+        security_dispatch_log: "ID de registro de envío de seguridad: WC26-4493-STAD",
+        utility_grid_title: "CONTROLES DEL ESTADIO",
+        ticket_hub_title: "Boletos de Partido",
+        stadium_routes_title: "Rutas del Estadio",
+        stays_food_title: "Hospedaje y Comida",
+        assistant_title: "Conserje IA",
+        emergency_shortcut_desc: "Toque para transmitir coordenadas de seguridad",
+        chat_send: "Enviar"
+      },
+      fr: {
+        hello_label: "Bienvenue",
+        gateway_title: "NOYAU DU STADE FIFA 2026",
+        gateway_subtitle: "Accédez à la télémétrie du stade, aux cartes, aux billets et aux outils de sécurité.",
+        sign_in: "Se connecter en tant que Fan",
+        current_match_ticket: "🎟️ Billet du Match Actuel",
+        gate: "PORTE",
+        section: "SECTION",
+        row: "RANGÉE",
+        seat: "SIÈGE",
+        stadium_entry_time: "HEURE D'ENTRÉE AU STADE",
+        active_ledger: "Mon Registre Actif",
+        no_tickets_yet: "Aucun billet acheté. Réservez ci-dessous !",
+        upcoming_matches: "Réserver les Prochains Matchs",
+        wayfinding_queues: "🏟️ Guidage et Files d'attente en Direct",
+        seat_section_finder: "Recherche de Section de Siège",
+        seat_section_desc: "Générez instantanément l'itinéraire le plus rapide pour éviter les files d'attente.",
+        find_route: "Calculer l'itinéraire",
+        live_queue_status: "Statut des Files en Direct",
+        sensor_feeds: "Flux de Capteurs en Temps Réel",
+        fastest_entry: "Entrée la Plus Rapide Recommandée",
+        stadium_guide: "🍔 Auberges, Repas & Suites",
+        open_gmaps: "Ouvrir l'itinéraire Google Maps",
+        back_to_dashboard: "← Retour au Tableau de bord",
+        emergency_sos: "⚠️ LIGNE DIRECTE D'URGENCE SOS",
+        emergency_desc: "Appuyez sur ce bouton uniquement en cas de besoin immédiat d'assistance médicale ou de sécurité. Votre position sera diffusée automatiquement.",
+        sos_panic: "SOS PANIQUE",
+        press_now: "APPUYER ICI",
+        broadcast_coordinates: "Coordenées de diffusion actuelles",
+        booking_confirmed: "Réservation Confirmée !",
+        booking_confirmed_desc: "Les détails de votre réservation de siège ont été synchronisés avec votre compte FIFA.",
+        match_resv: "RÉSERVATION MATCH",
+        date_gate: "DATE & PORTE",
+        paid_total: "TOTAL PAYÉ",
+        got_it: "Compris, voir le billet",
+        sos_signal_activated: "SIGNAL D'URGENCE SOS ACTIVÉ",
+        sos_dispatch_desc: "Les coordinateurs de sécurité et médicaux sont en route vers vos coordonnées exactes :",
+        user_seat_metrics: "DONNÉES DU SIÈGE UTILISATEUR",
+        do_not_move: "Ne bougez pas. Une équipe a été dépêchée vers votre balise.",
+        cancel_alarm: "❌ ANNULER L'ALARME (ERREUR)",
+        security_dispatch_log: "ID de répartition de sécurité : WC26-4493-STAD",
+        utility_grid_title: "CONTROLES DU STADE",
+        ticket_hub_title: "Billets de Match",
+        stadium_routes_title: "Ressources Stade",
+        stays_food_title: "Hôtel & Repas",
+        assistant_title: "Concierge IA",
+        emergency_shortcut_desc: "Appuyez pour diffuser les coordonnées de sécurité",
+        chat_send: "Envoyer"
+      }
+    };
+
+    // ----------------------------------------------------
+    // 4. LANGUAGE GATEWAY SELECTORS
+    // ----------------------------------------------------
+    function selectGatewayLanguage(lang) {
+      currentLanguage = lang;
+      
+      const languages = ['en', 'es', 'fr'];
+      languages.forEach(l => {
+        const btn = document.getElementById(`btn-lang-${l}`);
+        if (l === lang) {
+          btn.className = "bg-amber-500 text-slate-950 border border-amber-500 font-extrabold py-3.5 rounded-2xl text-xs transition-colors duration-200";
+        } else {
+          btn.className = "bg-slate-950 text-slate-400 border border-white/5 hover:border-white/10 font-bold py-3.5 rounded-2xl text-xs transition-colors duration-200";
+        }
+      });
+
+      // Update gateway modal text based on lang selection
+      document.getElementById("gateway-title").textContent = translations[lang].gateway_title;
+      document.getElementById("gateway-subtitle").textContent = translations[lang].gateway_subtitle;
+      document.getElementById("btn-sign-in").textContent = translations[lang].sign_in;
+      document.getElementById("fan-name-input").placeholder = lang === 'en' ? 'Enter Fan Username...' : lang === 'es' ? 'Ingrese nombre de usuario...' : "Entrez le nom d'utilisateur...";
+    }
+
+    function submitFanAuth() {
+      const nameVal = document.getElementById("fan-name-input").value.trim();
+      if (!nameVal) {
+        alert(currentLanguage === 'en' ? "Please input your Username." : currentLanguage === 'es' ? "Por favor ingrese su usuario." : "Veuillez entrer votre nom d'utilisateur.");
+        return;
+      }
+      currentUserName = nameVal;
+
+      // Close modal gateway smoothly
+      const gateway = document.getElementById("gateway-overlay");
+      gateway.classList.add("hidden");
+
+      // Set state in header/dashboard views
+      document.getElementById("dashboard-fan-name").textContent = currentUserName;
+
+      // Update selector translation sync
+      translateStaticDOM();
+
+      // Setup initialization values for views
+      updateStadiumUI(activeStadiumKey);
+      initAIConciergeWelcome();
+    }
+
+    function translateStaticDOM() {
+      // Loop over elements with data-translate attributes
+      const translateElements = document.querySelectorAll("[data-translate]");
+      translateElements.forEach(el => {
+        const key = el.getAttribute("data-translate");
+        if (translations[currentLanguage][key]) {
+          el.innerHTML = translations[currentLanguage][key];
+        }
+      });
+
+      // Update helper placeholders
+      const searchInput = document.getElementById("seat-section-input");
+      if (searchInput) {
+        searchInput.placeholder = translations[currentLanguage].seat_placeholder || "Type your section...";
+      }
+      
+      const chatInput = document.getElementById("chat-user-input");
+      if (chatInput) {
+        chatInput.placeholder = translations[currentLanguage].chat_placeholder || "Type a question...";
+      }
+    }
+
+    // ----------------------------------------------------
+    // 5. STADIUM SELECTION STATE SWITCHER
+    // ----------------------------------------------------
+    function changeActiveStadium(stadiumKey) {
+      activeStadiumKey = stadiumKey;
+      updateStadiumUI(stadiumKey);
+    }
+
+    function updateStadiumUI(stadiumKey) {
+      const data = stadiumsDatabase[stadiumKey];
+      
+      // Update Home dashboard descriptions & Coordinates
+      document.getElementById("dashboard-stadium-desc").textContent = 
+        `${data.name} • Coordinates: ${data.coords.lat}, ${data.coords.lng}`;
+
+      // Update Digital Ticket
+      document.getElementById("ticket-match-id").textContent = `MATCH ${data.liveMatch.id}`;
+      document.getElementById("ticket-match-teams").textContent = `${data.liveMatch.flagA} ${data.liveMatch.teamA} vs ${data.liveMatch.flagB} ${data.liveMatch.teamB}`;
+      document.getElementById("ticket-gate").textContent = data.liveMatch.gate;
+      document.getElementById("ticket-section").textContent = data.seat.section;
+      document.getElementById("ticket-row").textContent = data.seat.row;
+      document.getElementById("ticket-seat").textContent = data.seat.seat;
+
+      // Update emergency sub-texts
+      document.getElementById("sos-coord-badge").textContent = `${data.seat.section}, ${data.seat.row} (${data.name})`;
+      document.getElementById("sos-overlay-seat").textContent = `${data.seat.section}, ${data.seat.row}, ${data.seat.seat}`;
+      document.getElementById("sos-overlay-stadium").textContent = `${data.name.toUpperCase()} • ${data.liveMatch.gate.toUpperCase()}`;
+
+      // Update dynamic matches book list
+      renderMatchesList(data.matches);
+
+      // Render line checkers
+      renderQueueCheckers();
+
+      // GPS External map coordinate binding link update
+      document.getElementById("stadium-gps-badge").textContent = `${data.name} (Lat: ${data.coords.lat}, Lng: ${data.coords.lng})`;
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${data.coords.lat},${data.coords.lng}`;
+      document.getElementById("outbound-gmaps-link").setAttribute("href", mapsUrl);
+
+      // Render stays lists
+      filterVenues('all');
+    }
+
+    // ----------------------------------------------------
+    // 6. SPA CONTROLS (GRID NAV TOGGLING)
+    // ----------------------------------------------------
+    function togglePanel(panelId) {
+      // Hide dashboard & other screens
+      document.getElementById("panel-dashboard").classList.remove("active");
+      
+      const panels = ["tickets", "stadium", "food-stay", "help", "sos"];
+      panels.forEach(p => {
+        document.getElementById(`panel-${p}`).classList.remove("active");
+      });
+
+      // Show target panel
+      const target = document.getElementById(`panel-${panelId}`);
+      if (target) {
+        target.classList.add("active");
+      }
+    }
+
+    function showDashboardHome() {
+      const panels = ["tickets", "stadium", "food-stay", "help", "sos"];
+      panels.forEach(p => {
+        document.getElementById(`panel-${p}`).classList.remove("active");
+      });
+      document.getElementById("panel-dashboard").classList.add("active");
+    }
+
+    // ----------------------------------------------------
+    // 7. MATCH TICKETS & LEDGER LOGIC
+    // ----------------------------------------------------
+    function renderMatchesList(matches) {
+      const container = document.getElementById("matches-list-container");
+      container.innerHTML = "";
+
+      // Only display bookable matches that are not currently running
+      const currentStadiumData = stadiumsDatabase[activeStadiumKey];
+      const activeMatchId = currentStadiumData.liveMatch.id;
+      const bookableMatches = matches.filter(m => m.id !== activeMatchId);
+
+      bookableMatches.forEach(match => {
+        const row = document.createElement("div");
+        row.className = "bg-slate-900/40 border border-white/5 hover:border-white/10 rounded-2xl p-4 flex justify-between items-center transition-all duration-200";
+        row.innerHTML = `
+          <div class="space-y-1">
+            <p class="text-[10px] text-slate-500 tracking-wider font-extrabold uppercase">MATCH ${match.id} • GROUP STAGE</p>
+            <div class="flex items-center gap-1.5">
+              <span class="text-sm">${match.flagA}</span>
+              <span class="text-xs font-black text-white">${match.teamA}</span>
+              <span class="text-[10px] text-slate-500 font-bold">vs</span>
+              <span class="text-sm">${match.flagB}</span>
+              <span class="text-xs font-black text-white">${match.teamB}</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-semibold">${match.date} • ${match.time}</p>
+          </div>
+          <button onclick="requestMatchBooking(${match.id})"
+                  class="bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-slate-950 border border-amber-500/30 hover:border-transparent font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all duration-200 active:scale-95">
+            $${match.price}
+          </button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    let boughtLedger = [];
+
+    function requestMatchBooking(matchId) {
+      const currentStadiumData = stadiumsDatabase[activeStadiumKey];
+      const match = currentStadiumData.matches.find(m => m.id === matchId);
+      if (!match) return;
+
+      // Increment ticket count
+      purchasedTicketsCount++;
+      document.getElementById("dashboard-tickets-count").textContent = 
+        purchasedTicketsCount === 1 ? `1 Ticket purchased` : `${purchasedTicketsCount} Tickets purchased`;
+      
+      document.getElementById("ledger-count-badge").textContent = `Purchased: ${purchasedTicketsCount}`;
+
+      // Insert item metadata into Active Ledger
+      boughtLedger.push(match);
+      renderLedger();
+
+      // Trigger booking confirmation modal
+      document.getElementById("modal-match-id").textContent = `MATCH ${match.id}`;
+      document.getElementById("modal-match-teams").textContent = `${match.flagA} ${match.teamA} vs ${match.flagB} ${match.teamB}`;
+      document.getElementById("modal-match-date").textContent = `${match.date} • Entry: ${match.gate}`;
+      document.getElementById("modal-match-price").textContent = `$${match.price}.00`;
+
+      document.getElementById("booking-modal").classList.remove("hidden");
+    }
+
+    function renderLedger() {
+      const container = document.getElementById("ledger-rows-container");
+      container.innerHTML = "";
+
+      if (boughtLedger.length === 0) {
+        container.innerHTML = `<p class="text-center py-4" id="ledger-empty-text" data-translate="no_tickets_yet">${translations[currentLanguage].no_tickets_yet}</p>`;
+        return;
+      }
+
+      boughtLedger.forEach((ticket, index) => {
+        const item = document.createElement("div");
+        item.className = "bg-slate-950/60 border border-white/5 rounded-xl p-3 flex justify-between items-center text-xs";
+        item.innerHTML = `
+          <div>
+            <p class="font-extrabold text-white">MATCH ${ticket.id} (${ticket.teamA} vs ${ticket.teamB})</p>
+            <p class="text-[10px] text-slate-500">${ticket.date} • ${ticket.gate} • Verified Entry pass</p>
+          </div>
+          <span class="text-emerald-400 font-extrabold">Paid $${ticket.price}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function closeBookingModal() {
+      document.getElementById("booking-modal").classList.add("hidden");
+    }
+
+    // ----------------------------------------------------
+    // 8. WAYFINDING ROUTES & QUEUE CALCULATORS
+    // ----------------------------------------------------
+    function renderQueueCheckers() {
+      const data = stadiumsDatabase[activeStadiumKey];
+      const container = document.getElementById("queue-bars-container");
+      container.innerHTML = "";
+
+      data.queues.forEach(zone => {
+        let barColor = "bg-emerald-500";
+        let textColor = "text-emerald-400";
+        let tagEmoji = "🟢";
+        let statusText = currentLanguage === 'en' ? "Clear (Fast)" : currentLanguage === 'es' ? "Despejado (Rápido)" : "Fluide (Rapide)";
+
+        if (zone.waitTime > 15) {
+          barColor = "bg-rose-500";
+          textColor = "text-rose-400";
+          tagEmoji = "🔴";
+          statusText = currentLanguage === 'en' ? "Very Busy" : currentLanguage === 'es' ? "Muy Concurrido" : "Très Chargé";
+        } else if (zone.waitTime >= 5) {
+          barColor = "bg-amber-500";
+          textColor = "text-amber-400";
+          tagEmoji = "🟡";
+          statusText = currentLanguage === 'en' ? "Moderate" : currentLanguage === 'es' ? "Moderado" : "Modéré";
+        }
+
+        const percent = Math.min(100, Math.max(12, (zone.waitTime / 35) * 100));
+
+        const barRow = document.createElement("div");
+        barRow.className = "bg-slate-900/40 border border-white/5 rounded-2xl p-4 space-y-2.5";
+        barRow.innerHTML = `
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-bold text-slate-200">${zone.name}</span>
+            <span class="font-black ${textColor} flex items-center gap-1">
+              <span>${tagEmoji}</span> ${zone.waitTime} mins
+            </span>
+          </div>
+          <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden border border-white/5">
+            <div class="${barColor} h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+          </div>
+          <div class="flex justify-between items-center text-[9px] text-slate-500 font-bold uppercase">
+            <span>Status: ${statusText}</span>
+            <span>Est. Wait</span>
+          </div>
+        `;
+        container.appendChild(barRow);
+      });
+
+      // Find shortest gate wait time
+      const gates = data.queues.filter(q => q.name.includes("Gate"));
+      const sortedGates = [...gates].sort((a, b) => a.waitTime - b.waitTime);
+      const bestGate = sortedGates[0];
+
+      // Update recommendation alert box
+      document.getElementById("smart-alert-text").innerHTML = 
+        currentLanguage === 'en'
+        ? `Enter via <strong>${bestGate.name}</strong>. Current wait is only <strong>${bestGate.waitTime} minutes</strong>.`
+        : currentLanguage === 'es'
+        ? `Ingrese por <strong>${bestGate.name}</strong>. La espera actual es de solo <strong>${bestGate.waitTime} minutos</strong>.`
+        : `Entrez via <strong>${bestGate.name}</strong>. L'attente actuelle est de seulement <strong>${bestGate.waitTime} minutes</strong>.`;
+
+      // Update Dashboard quick tracker text
+      document.getElementById("dashboard-fastest-gate").textContent = 
+        currentLanguage === 'en' ? `Fastest: ${bestGate.name.split(' ')[0]} ${bestGate.name.split(' ')[1]} (${bestGate.waitTime}m)` :
+        currentLanguage === 'es' ? `Rápido: ${bestGate.name.split(' ')[0]} ${bestGate.name.split(' ')[1]} (${bestGate.waitTime}m)` :
+        `Rapide: ${bestGate.name.split(' ')[0]} ${bestGate.name.split(' ')[1]} (${bestGate.waitTime}m)`;
+    }
+
+    function calculateRoute() {
+      const input = document.getElementById("seat-section-input").value.trim();
+      const outputContainer = document.getElementById("route-output-container");
+      const stepsDiv = document.getElementById("route-steps");
+
+      if (!input) {
+        alert(currentLanguage === 'en' ? "Please enter your seat section." : currentLanguage === 'es' ? "Por favor ingrese su sección." : "Veuillez entrer votre section.");
+        return;
+      }
+
+      const data = stadiumsDatabase[activeStadiumKey];
+      const gates = data.queues.filter(q => q.name.includes("Gate"));
+      const sortedGates = [...gates].sort((a, b) => a.waitTime - b.waitTime);
+      const optimalGate = sortedGates[0]; 
+      const congestedGate = [...gates].sort((a, b) => b.waitTime - a.waitTime)[0];
+
+      outputContainer.classList.remove("hidden");
+
+      if (currentLanguage === 'en') {
+        stepsDiv.innerHTML = `
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center">1</span>
+              <span class="w-0.5 h-6 bg-white/10 my-1"></span>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">GO TO SECURITY ZONE</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Use <span class="text-emerald-400 font-extrabold">${optimalGate.name}</span>. It has the shortest delay (${optimalGate.waitTime}m). <br><span class="text-rose-400">⚠️ Avoid ${congestedGate.name} (${congestedGate.waitTime}m wait).</span></p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center">2</span>
+              <span class="w-0.5 h-6 bg-white/10 my-1"></span>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">GATE ENTRY & NFC PASS</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Scan your digital ticket barcode at the turnstiles. Follow the color-coded arrows on Level 1.</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black flex items-center justify-center">3</span>
+            </div>
+            <div>
+              <p class="font-extrabold text-emerald-400 text-xs">REACH SECTION ${input.toUpperCase()}</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Follow portal directories on the concourse level. Your section ${input.toUpperCase()} is directly ahead.</p>
+            </div>
+          </div>
+        `;
+      } else if (currentLanguage === 'es') {
+        stepsDiv.innerHTML = `
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center">1</span>
+              <span class="w-0.5 h-6 bg-white/10 my-1"></span>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">IR A LA ZONA DE SEGURIDAD</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Use <span class="text-emerald-400 font-extrabold">${optimalGate.name}</span>. Tiene la espera más corta (${optimalGate.waitTime}m). <br><span class="text-rose-400">⚠️ Evite ${congestedGate.name} (${congestedGate.waitTime}m de espera).</span></p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center">2</span>
+              <span class="w-0.5 h-6 bg-white/10 my-1"></span>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">ACCESO Y ESCANEO DE BOLETOS</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Escanee su boleto digital en los torniquetes. Siga las flechas codificadas por colores en el Nivel 1.</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black flex items-center justify-center">3</span>
+            </div>
+            <div>
+              <p class="font-extrabold text-emerald-400 text-xs">LLEGAR A LA SECCIÓN ${input.toUpperCase()}</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Siga los directorios en el pasillo principal. Su sección ${input.toUpperCase()} está justo adelante.</p>
+            </div>
+          </div>
+        `;
+      } else {
+        stepsDiv.innerHTML = `
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center">1</span>
+              <span class="w-0.5 h-6 bg-white/10 my-1"></span>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">REJOINDRE LA ZONE DE SÉCURITÉ</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Utilisez <span class="text-emerald-400 font-extrabold">${optimalGate.name}</span>. L'attente y est minimale (${optimalGate.waitTime}m). <br><span class="text-rose-400">⚠️ Évitez ${congestedGate.name} (${congestedGate.waitTime}m d'attente).</span></p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center">2</span>
+              <span class="w-0.5 h-6 bg-white/10 my-1"></span>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">ENTRÉE ET VALIDATION DU TICKET</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Scannez votre billet numérique aux portillons. Suivez les flèches directionnelles au Niveau 1.</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex flex-col items-center">
+              <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black flex items-center justify-center">3</span>
+            </div>
+            <div>
+              <p class="font-extrabold text-emerald-400 text-xs">ATTEINDRE LA SECTION ${input.toUpperCase()}</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Suivez la signalisation dans le hall d'entrée. Votre section ${input.toUpperCase()} se trouve droit devant.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      setTimeout(() => {
+        outputContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    // ----------------------------------------------------
+    // 9. STAYS, LIVE OCCUPANCIES & EXTERNAL GOOGLE MAPS
+    // ----------------------------------------------------
+    function filterVenues(filterType) {
+      const filters = ["all", "budget", "luxury"];
+      filters.forEach(type => {
+        const btn = document.getElementById(`btn-filter-${type}`);
+        if (type === filterType) {
+          btn.className = "flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-amber-500 text-slate-950";
+        } else {
+          btn.className = "flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-400 hover:text-slate-100";
+        }
+      });
+
+      renderVenues(filterType);
+    }
+
+    function renderVenues(filterType) {
+      const container = document.getElementById("venues-list");
+      container.innerHTML = "";
+
+      const currentData = stadiumsDatabase[activeStadiumKey];
+      let filtered = currentData.hotels;
+
+      if (filterType === "budget") {
+        filtered = currentData.hotels.filter(v => v.price < 170);
+      } else if (filterType === "luxury") {
+        filtered = currentData.hotels.filter(v => v.price > 220);
+      }
+
+      filtered.forEach(venue => {
+        const hasVacancy = venue.vacancies > 0;
+        
+        let badgeColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+        let badgeText = currentLanguage === 'en' ? `🟢 Vacancies Available (${venue.vacancies} rooms)` : currentLanguage === 'es' ? `🟢 Vacantes Disponibles (${venue.vacancies} habs)` : `🟢 Places Disponibles (${venue.vacancies} ch)`;
+        
+        if (!hasVacancy) {
+          badgeColor = "text-rose-400 bg-rose-500/10 border-rose-500/20";
+          badgeText = translations[currentLanguage].full_occupancy;
+        }
+
+        const card = document.createElement("div");
+        card.className = "bg-slate-900/40 border border-white/5 hover:border-white/10 rounded-2xl p-4 flex gap-4 transition-all duration-200";
+        card.innerHTML = `
+          <div class="w-12 h-12 rounded-xl bg-slate-950 border border-white/5 flex items-center justify-center text-2xl shrink-0 self-center">
+            ${venue.icon}
+          </div>
+          <div class="flex-1 space-y-1.5 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${badgeColor}">
+                ${badgeText}
+              </span>
+              <span class="text-[10px] text-slate-400 font-medium">${venue.distance} mi away</span>
+            </div>
+            <h4 class="text-sm font-black text-white truncate">${venue.name}</h4>
+            <p class="text-[10px] text-slate-400 truncate leading-none">${venue.desc}</p>
+            <div class="flex justify-between items-center pt-1 border-t border-white/5">
+              <span class="text-xs font-black text-emerald-400">$${venue.price} / day</span>
+              
+              <button onclick="bookHotelStay('${venue.id}')" ${!hasVacancy ? 'disabled' : ''}
+                      class="px-4 py-2 rounded-xl text-[10px] font-extrabold transition-all duration-200 active:scale-95 ${hasVacancy ? 'bg-amber-500 text-slate-950 hover:bg-amber-600' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">
+                ${translations[currentLanguage].book_stay}
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      
+      // Update home deals badge counts
+      document.getElementById("dashboard-deals-count").textContent = `${currentData.hotels.length} hotels near stadium`;
+    }
+
+    function bookHotelStay(hotelId) {
+      // Find the hotel inside active stadium
+      const currentData = stadiumsDatabase[activeStadiumKey];
+      const hotel = currentData.hotels.find(h => h.id === hotelId);
+
+      if (hotel && hotel.vacancies > 0) {
+        hotel.vacancies--;
+        
+        // Re-render and show prompt
+        alert(currentLanguage === 'en' ? `Stay booked successfully at ${hotel.name}!` : currentLanguage === 'es' ? `¡Estancia reservada con éxito en ${hotel.name}!` : `Réservation réussie à ${hotel.name}!`);
+        renderVenues('all');
+      }
+    }
+
+    // ----------------------------------------------------
+    // 10. MULTILINGUAL AI CONCIERGE CHAT ENGINE
+    // ----------------------------------------------------
+    function initAIConciergeWelcome() {
+      const container = document.getElementById("chat-messages-container");
+      container.innerHTML = `
+        <div class="flex justify-start mb-1 animate-fade-in-up">
+          <div class="bg-slate-800/80 text-slate-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-[85%] text-xs shadow-md border border-slate-700/20 leading-relaxed">
+            ${translations[currentLanguage].chat_welcome}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleChatKeyDown(event) {
+      if (event.key === "Enter") {
+        sendChatMessage();
+      }
+    }
+
+    function sendChatMessage() {
+      const inputEl = document.getElementById("chat-user-input");
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      inputEl.value = "";
+      const chatContainer = document.getElementById("chat-messages-container");
+
+      // Append User message
+      const userBubble = document.createElement("div");
+      userBubble.className = "flex justify-end mb-1 animate-fade-in-up";
+      userBubble.innerHTML = `
+        <div class="bg-amber-500 text-slate-950 rounded-2xl rounded-tr-none px-4 py-2.5 max-w-[85%] text-xs font-bold shadow-md">
+          ${escapeHTML(text)}
+        </div>
+      `;
+      chatContainer.appendChild(userBubble);
+      scrollToLatestMessage();
+
+      // Append typing indicator
+      const typingBubble = document.createElement("div");
+      typingBubble.id = "chat-typing-indicator";
+      typingBubble.className = "flex justify-start mb-1";
+      typingBubble.innerHTML = `
+        <div class="bg-slate-800/80 text-slate-300 rounded-2xl rounded-tl-none px-4 py-3 text-xs shadow-md border border-slate-700/20 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
+          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+        </div>
+      `;
+      chatContainer.appendChild(typingBubble);
+      scrollToLatestMessage();
+
+      // Simulated network loader timing loop (exactly 1000ms delay)
+      setTimeout(() => {
+        const indicator = document.getElementById("chat-typing-indicator");
+        if (indicator) indicator.remove();
+
+        const responseText = calculateAIResponse(text);
+
+        const aiBubble = document.createElement("div");
+        aiBubble.className = "flex justify-start mb-1 animate-fade-in-up";
+        aiBubble.innerHTML = `
+          <div class="bg-slate-800/80 text-slate-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-[85%] text-xs shadow-md border border-slate-700/20 leading-relaxed">
+            ${responseText}
+          </div>
+        `;
+        chatContainer.appendChild(aiBubble);
+        scrollToLatestMessage();
+
+      }, 1000);
+    }
+
+    function scrollToLatestMessage() {
+      const chatContainer = document.getElementById("chat-messages-container");
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function calculateAIResponse(userText) {
+      const lower = userText.toLowerCase();
+      
+      const responses = {
+        en: {
+          bag: "👜 <strong>FIFA Bag Policy:</strong> Only clear plastic, vinyl, or PVC bags smaller than 12x6x12 inches are allowed inside the stadium gates. Small clutch purses under 4.5x6.5 inches are also permitted without being clear.",
+          food: "🍔 <strong>Food & Drinks:</strong> Outside food/beverages are strictly banned inside security. However, you are allowed to carry one empty, clear plastic bottle (20oz or smaller) to fill at stadium drinking fountains. Check out the <strong>Stays & Food</strong> screen for local recommendations!",
+          ticket: "🎟️ <strong>Digital Tickets:</strong> Keep your mobile digital pass ready for scan upon reaching the turnstile line. The ticket renders a live-updating bar/QR. You can view yours inside the <strong>Tickets</strong> screen.",
+          wifi: "📶 <strong>Stadium Fan Wi-Fi:</strong> Connect for free by selecting the SSID <strong>FIFA2026_FREE_FAN_WIFI</strong> from your device's settings network list. Accept the login terms popup to enjoy high-speed browsing.",
+          route: "🏟️ <strong>Gate Routing:</strong> Head over to the <strong>Stadium Routes</strong> panel on the dashboard home, input your seat section number, and hit 'Find Route'. The tool determines the shortest live gate entry queue lines to save you waiting.",
+          transport: "🚌 <strong>Getting to Stadium:</strong> Heavy traffic is expected. We advise using train transport lines directly to the Stadium Station, or booking official park-and-ride buses. Rideshare pickups operate from Lot E.",
+          default: "⚽ <strong>FIFA Concierge:</strong> I am here to ensure you have a safe and simple tournament experience. Ask me about stadium bag policies, ticket entry guides, parking zones, free Fan Wi-Fi, or line checks!"
+        },
+        es: {
+          bag: "👜 <strong>Política de Bolsos de la FIFA:</strong> Solo se permiten bolsos de plástico transparente, vinilo o PVC de menos de 12x6x12 pulgadas. También se permiten bolsos de mano pequeños de menos de 4.5x6.5 pulgadas sin ser transparentes.",
+          food: "🍔 <strong>Comida y Bebidas:</strong> Los alimentos/bebidas externos están estrictamente prohibidos. Sin embargo, se le permite llevar una botella plástica vacía y transparente (20 oz o menos) para llenar en los bebederos del estadio. ¡Visite la pantalla de <strong>Hospedaje y Comida</strong> para ver recomendaciones!",
+          ticket: "🎟️ <strong>Boletos Digitales:</strong> Mantenga listo su pase digital en su móvil al llegar a la línea de torniquetes. El boleto muestra un código QR dinámico. Puede verlo en la pantalla de <strong>Boletos</strong>.",
+          wifi: "📶 <strong>Wi-Fi de Fans:</strong> Conéctese gratis seleccionando la red <strong>FIFA2026_FREE_FAN_WIFI</strong>. Acepte los términos en la ventana emergente para comenzar a navegar.",
+          route: "🏟️ <strong>Direcciones de Puerta:</strong> Vaya al panel de <strong>Rutas del Estadio</strong> en el inicio, ingrese su sección de asientos y haga clic en 'Buscar Ruta'. El sistema calculará la puerta más rápida.",
+          transport: "🚌 <strong>Transporte al Estadio:</strong> Se esperan demoras de tráfico. Recomendamos tomar líneas de tren directas a la estación del estadio o los autobuses exprés oficiales. Los servicios de Uber/Lyft operan en el Estacionamiento E.",
+          default: "⚽ <strong>Conserje FIFA:</strong> Estoy aquí para ayudarle a tener una experiencia cómoda y segura. ¡Consúlteme sobre políticas de bolsos, Wi-Fi, boletos o transporte!"
+        },
+        fr: {
+          bag: "👜 <strong>Politique des sacs de la FIFA:</strong> Seuls les sacs en plastique transparent, vinyle ou PVC inférieurs à 12x6x12 pouces sont autorisés aux entrées. Les petites pochettes de moins de 4.5x6.5 pouces sont également tolérées sans être transparentes.",
+          food: "🍔 <strong>Nourriture & Boissons:</strong> La nourriture extérieure est interdite. Vous pouvez cependant apporter une bouteille en plastique vide (20oz ou moins) pour la remplir aux fontaines du stade. Consultez l'onglet <strong>Hôtel & Repas</strong> pour nos adresses !",
+          ticket: "🎟️ <strong>Billets Numériques:</strong> Préparez votre ticket mobile à l'approche des portillons. Le code QR se met à jour en temps réel. Vous pouvez y accéder via l'écran <strong>Billets</strong>.",
+          wifi: "📶 <strong>Wi-Fi Fan Gratuit:</strong> Connectez-vous en sélectionnant le réseau <strong>FIFA2026_FREE_FAN_WIFI</strong>. Acceptez les conditions dans la page pop-up pour naviguer librement.",
+          route: "🏟️ <strong>Guidage des Accès:</strong> Allez sur le panel <strong>Ressources Stade</strong>, saisissez votre numéro de section et cliquez sur 'Calculer l'itinéraire' pour obtenir le chemin d'accès le plus rapide.",
+          transport: "🚌 <strong>Venir au Stade:</strong> D'importants embouteillages sont prévus. Privilégiez les lignes de train directes vers la gare du stade ou les navettes officielles. Les déposes Uber/navettes se font sur le Parking E.",
+          default: "⚽ <strong>Concierge FIFA:</strong> Je suis là pour rendre votre expérience fluide et agréable. Posez-moi des questions sur les sacs, le Wi-Fi gratuit, vos accès ou les transports !"
+        }
+      };
+
+      const set = responses[currentLanguage];
+
+      if (lower.includes("bag") || lower.includes("backpack") || lower.includes("purse") || lower.includes("bolso") || lower.includes("mochila") || lower.includes("sac")) {
+        return set.bag;
+      }
+      if (lower.includes("food") || lower.includes("drink") || lower.includes("water") || lower.includes("eat") || lower.includes("comida") || lower.includes("agua") || lower.includes("nourriture") || lower.includes("eau")) {
+        return set.food;
+      }
+      if (lower.includes("ticket") || lower.includes("barcode") || lower.includes("qr") || lower.includes("pass") || lower.includes("boleto") || lower.includes("billet")) {
+        return set.ticket;
+      }
+      if (lower.includes("wifi") || lower.includes("internet") || lower.includes("connection") || lower.includes("réseau")) {
+        return set.wifi;
+      }
+      if (lower.includes("route") || lower.includes("find") || lower.includes("gate") || lower.includes("section") || lower.includes("puerta") || lower.includes("porte") || lower.includes("chemin")) {
+        return set.route;
+      }
+      if (lower.includes("transport") || lower.includes("uber") || lower.includes("bus") || lower.includes("train") || lower.includes("parking") || lower.includes("autobus") || lower.includes("gare")) {
+        return set.transport;
+      }
+
+      return set.default;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // ----------------------------------------------------
+    // 11. EMERGENCY SOS BROADCASTING OVERLAYS
+    // ----------------------------------------------------
+    function triggerSOSPanic() {
+      document.getElementById("sos-overlay").classList.remove("hidden");
+    }
+
+    function cancelSOSPanic() {
+      document.getElementById("sos-overlay").classList.add("hidden");
+    }
+
+    // ----------------------------------------------------
+    // 12. TELEMETRY LIVE TICK LOOP ENGINE (15 SECONDS)
+    // ----------------------------------------------------
+    setInterval(() => {
+      // 1. Shift line checkers wait times randomly (+/- 2 mins)
+      for (let key in stadiumsDatabase) {
+        const data = stadiumsDatabase[key];
+        data.queues.forEach(zone => {
+          const delta = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
+          zone.waitTime = Math.max(2, Math.min(45, zone.waitTime + delta));
+        });
+      }
+
+      // 2. Randomly toggle vacancies counts in hotels
+      for (let key in stadiumsDatabase) {
+        const data = stadiumsDatabase[key];
+        data.hotels.forEach(hotel => {
+          // 15% chance to toggle vacancy state or alter room counts
+          if (Math.random() < 0.15) {
+            if (hotel.vacancies === 0) {
+              hotel.vacancies = Math.floor(Math.random() * 4) + 1; // 1-4 rooms free
+            } else {
+              const delta = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+              hotel.vacancies = Math.max(0, Math.min(hotel.maxVacancies, hotel.vacancies + delta));
+            }
+          }
+        });
+      }
+
+      // 3. Render current active views changes in real-time
+      renderQueueCheckers();
+      renderVenues('all');
+
+      // Console logger telemetry feedback trace
+      console.log(`[Telemetry Engine Broadcast] Live tick updated at ${new Date().toLocaleTimeString()} for Active Stadium: ${activeStadiumKey}`);
+      
+    }, 15000);
+
+    // ----------------------------------------------------
+    // 13. GAME CLOCK TICK TELEMETRY ENGINE (1 SECOND)
+    // ----------------------------------------------------
+    setInterval(() => {
+      // Advance match timer
+      for (let key in stadiumsDatabase) {
+        const match = stadiumsDatabase[key].liveMatch;
+        match.timeSec++;
+        if (match.timeSec >= 60) {
+          match.timeSec = 0;
+          match.timeMin++;
+        }
+        
+        // Random live goal scorer simulation (0.5% chance per second)
+        if (Math.random() < 0.005) {
+          if (Math.random() < 0.5) {
+            match.scoreA++;
+          } else {
+            match.scoreB++;
+          }
+        }
+      }
+
+      // Update active ticket timer HUD telemetry if on match ticket
+      const activeMatch = stadiumsDatabase[activeStadiumKey].liveMatch;
+      const minStr = String(activeMatch.timeMin).padStart(2, '0');
+      const secStr = String(activeMatch.timeSec).padStart(2, '0');
+      document.getElementById("ticket-live-time").textContent = `${minStr}:${secStr}`;
+      
+      const teamA = activeMatch.teamA;
+      const teamB = activeMatch.teamB;
+      document.getElementById("ticket-live-score").textContent = `${teamA} ${activeMatch.scoreA} - ${activeMatch.scoreB} ${teamB}`;
+
+    }, 1000);
+
+  </script>
+</body>
+</html>
