@@ -1,0 +1,23 @@
+{
+  "name": "fifa-2026-stadium-core",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Multi-Stadium Core Telemetry Companion App for FIFA World Cup 2026",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "fifa",
+    "stadium",
+    "companion",
+    "telemetry",
+    "jest"
+  ],
+  "author": "FIFA Dev Core Team",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
+  }
+}
