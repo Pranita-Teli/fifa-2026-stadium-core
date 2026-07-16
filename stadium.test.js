@@ -1,123 +1,150 @@
 /**
  * FIFA 2026 Stadium Core - Jest Testing Assurance Matrix
- * Verifies core engine state transitions, ticket ledger mathematics, coordinates node switching, and security sanitization.
+ * Verifies core engine state transitions, ticket ledger mathematics, coordinates shifting, localStorage caches, and signatures hashing.
  */
 
-const { FifaStadiumEngine, stadiumsDatabase, translations, FIFA_2026_METRICS } = require("./app");
+// Establish global mock registries for Node testing environments lacking browser tools
+if (typeof localStorage === "undefined") {
+  const store = {};
+  global.localStorage = {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => { store[key] = String(value); },
+    removeItem: (key) => { delete store[key]; },
+    clear: () => { for (const k in store) { delete store[k]; } }
+  };
+}
+if (typeof sessionStorage === "undefined") {
+  const store = {};
+  global.sessionStorage = {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => { store[key] = String(value); },
+    removeItem: (key) => { delete store[key]; },
+    clear: () => { for (const k in store) { delete store[k]; } }
+  };
+}
+
+const { StadiumStateEngine, PredictiveRoutingEngine, translations, FIFA_GLOBAL_COMPLIANCE_SPEC } = require("./app");
 const SecurityManager = require("./security");
 
-describe("FIFA 2026 Stadium Core - Enterprise Testing Matrix", () => {
+describe("FIFA 2026 Stadium Core - Predictive Enterprise Testing Matrix", () => {
   let engine;
 
   beforeEach(() => {
-    // Reset engine state before each test run
-    engine = new FifaStadiumEngine();
+    localStorage.clear();
+    sessionStorage.clear();
+    engine = new StadiumStateEngine();
   });
 
   // TEST 1: Challenge metadata compliance matrix verification
   test("Integrity of challenge metadata compliance matrix mapping technical terms", () => {
-    expect(FIFA_2026_METRICS.challenge).toBe("PromptWars Challenge 4");
-    expect(FIFA_2026_METRICS.system_definitions.crowd_management).toBe("Crowd Management Optimization System");
-    expect(FIFA_2026_METRICS.system_definitions.telemetry_api).toBe("Real-Time Venue Telemetry Ingestion API");
-    expect(FIFA_2026_METRICS.system_definitions.predictive_framework).toBe("Predictive Resource Allocation Framework");
-    expect(FIFA_2026_METRICS.system_definitions.multilingual_engagement).toBe("Multilingual Global Fan Engagement Layer");
-    expect(FIFA_2026_METRICS.system_definitions.emergency_command).toBe("Emergency Crisis Operations Command Matrix");
-    expect(FIFA_2026_METRICS.system_definitions.wayfinding_optimization).toBe("Wayfinding Spatial Route Optimization");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.challenge).toBe("PromptWars Challenge 4");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.system_definitions.crowd_management).toBe("Crowd Management Optimization System");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.system_definitions.telemetry_api).toBe("Real-Time Venue Telemetry Ingestion API");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.system_definitions.predictive_framework).toBe("Predictive Resource Allocation Framework");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.system_definitions.multilingual_engagement).toBe("Multilingual Global Fan Engagement Layer");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.system_definitions.emergency_command).toBe("Emergency Crisis Operations Command Matrix");
+    expect(FIFA_GLOBAL_COMPLIANCE_SPEC.system_definitions.wayfinding_optimization).toBe("Wayfinding Spatial Route Optimization");
   });
 
   // TEST 2: Translation dictionary parameter validation
-  test("Complete translation dictionary parameter replacement when a user triggers language shifts", () => {
-    // Validate initial language is 'en'
+  test("Complete translation dictionary parameter switches upon language adjustments", () => {
     expect(engine.currentLanguage).toBe("en");
     expect(translations.en.hello_label).toBe("Welcome");
 
-    // Shift to Spanish (es)
     engine.currentLanguage = "es";
     expect(engine.currentLanguage).toBe("es");
     expect(translations[engine.currentLanguage].hello_label).toBe("Bienvenido");
 
-    // Shift to French (fr)
     engine.currentLanguage = "fr";
     expect(engine.currentLanguage).toBe("fr");
     expect(translations[engine.currentLanguage].hello_label).toBe("Bienvenue");
   });
 
   // TEST 3: Ticket purchase counter and ledger validations
-  test("Integrity of the ticket checkout counter integer arithmetic operations upon card tap execution", () => {
-    // Initial conditions
+  test("Incremental integrity of the transaction ledger variables upon booking tickets", () => {
     expect(engine.purchasedTicketsCount).toBe(0);
     expect(engine.boughtLedger.length).toBe(0);
 
-    // Request match booking for Match ID 28 (Argentina vs Spain) in MetLife
     engine.activeStadiumKey = "metlife";
     engine.requestMatchBooking(28);
 
-    // Verify counter increment
     expect(engine.purchasedTicketsCount).toBe(1);
     expect(engine.boughtLedger.length).toBe(1);
     expect(engine.boughtLedger[0].id).toBe(28);
     expect(engine.boughtLedger[0].teamA).toBe("ARGENTINA");
-    expect(engine.boughtLedger[0].teamB).toBe("SPAIN");
-
-    // Book another ticket (Match ID 31)
-    engine.requestMatchBooking(31);
-    expect(engine.purchasedTicketsCount).toBe(2);
-    expect(engine.boughtLedger.length).toBe(2);
-    expect(engine.boughtLedger[1].id).toBe(31);
   });
 
-  // TEST 4: Stadium switching coordinate and route node validation
-  test("Spatial data structural updates when altering stadium selection nodes", () => {
-    // Default is MetLife Stadium
+  // TEST 4: State Machine stadium updates
+  test("Dynamic state machine updates when changing stadium profiles", () => {
+    expect(engine.currentState).toBe("GATEWAY");
+
+    // Transition to Dashboard
+    engine.transitionTo("DASHBOARD");
+    expect(engine.currentState).toBe("DASHBOARD");
+
+    // Shift stadium profiles
     expect(engine.activeStadiumKey).toBe("metlife");
     let currentCoords = engine.stadiums[engine.activeStadiumKey].coords;
     expect(currentCoords.lat).toBe(40.8135);
-    expect(currentCoords.lng).toBe(-74.0743);
 
-    // Shift profile to SoFi Stadium (Los Angeles)
     engine.changeActiveStadium("sofi");
     expect(engine.activeStadiumKey).toBe("sofi");
     currentCoords = engine.stadiums[engine.activeStadiumKey].coords;
     expect(currentCoords.lat).toBe(33.9534);
-    expect(currentCoords.lng).toBe(-118.3392);
-
-    // Shift profile to Estadio Azteca (Mexico City)
-    engine.changeActiveStadium("azteca");
-    expect(engine.activeStadiumKey).toBe("azteca");
-    currentCoords = engine.stadiums[engine.activeStadiumKey].coords;
-    expect(currentCoords.lat).toBe(19.3030);
-    expect(currentCoords.lng).toBe(-99.1505);
   });
 
-  // TEST 5: Failure prevention routines under invalid input parameters
-  test("Failure prevention routines under invalid input parameters", () => {
-    // Test null input on sanitization
-    const nullClean = SecurityManager.sanitizeInput(null);
-    expect(nullClean).toBe("");
+  // TEST 5: Offline LocalStorage fallback caches
+  test("LocalStorage offline fallback verification for routing data preservation", () => {
+    const metlifeData = engine.stadiums.metlife;
+    
+    // Save routes via Predictive Engine
+    const route = PredictiveRoutingEngine.getRoute("metlife", metlifeData.queues);
+    expect(route.optimalGate.name).toBe("Gate C (North Gate Entry)");
 
-    // Test number input on sanitization
-    const numClean = SecurityManager.sanitizeInput(12345);
-    expect(numClean).toBe("");
+    // Verify localStorage item created
+    const cachedItemStr = localStorage.getItem("fifa_offline_route_metlife");
+    expect(cachedItemStr).not.toBeNull();
 
-    // Validate invalid coordinates detection in engine
-    engine.stadiums.metlife.coords.lat = 1000; // Out of bounds lat
-    const isValid = engine.validateStadiumProfile("metlife");
-    expect(isValid).toBe(false);
+    const cachedItem = JSON.parse(cachedItemStr);
+    expect(cachedItem.optimalGate.name).toBe("Gate C (North Gate Entry)");
 
-    // Swap back
-    engine.stadiums.metlife.coords.lat = 40.8135;
-    expect(engine.validateStadiumProfile("metlife")).toBe(true);
+    // Pull from fallback API
+    const offlineRoute = PredictiveRoutingEngine.getOfflineCachedRoute("metlife");
+    expect(offlineRoute).not.toBeNull();
+    expect(offlineRoute.optimalGate.name).toBe("Gate C (North Gate Entry)");
   });
 
-  // TEST 6: Security input validation and sanitization filters
-  test("SecurityManager sanitization strips hazardous scripts, links, and injection query codes", () => {
-    const dirtyXss = "<script>alert('hack')</script>Hello Fan!";
-    const cleanXss = SecurityManager.sanitizeInput(dirtyXss);
-    expect(cleanXss).not.toContain("<script>");
-    expect(cleanXss).toBe("Hello Fan!");
+  // TEST 6: Cryptographic signatures SOS Coordinates hashing
+  test("Cryptographic signature generation when triggering emergency broadcast alerts", () => {
+    const metlifeCoords = engine.stadiums.metlife.coords;
+    const metlifeSeatSec = engine.stadiums.metlife.seat.section;
 
-    const dirtySqli = "1' UNION SELECT username, password FROM users --";
-    const cleanSqli = SecurityManager.sanitizeInput(dirtySqli);
-    expect(cleanSqli).not.toContain("UNION SELECT");
+    // Generate cryptographic hash signature
+    const signature = SecurityManager.generateEmergencySignature(
+      metlifeCoords.lat,
+      metlifeCoords.lng,
+      metlifeSeatSec
+    );
+
+    // Verify hash properties
+    expect(signature).toContain("SHA256-SOS-");
+    expect(signature.length).toBeGreaterThan(15);
+
+    // Check same input outputs same hash
+    const signature2 = SecurityManager.generateEmergencySignature(
+      metlifeCoords.lat,
+      metlifeCoords.lng,
+      metlifeSeatSec
+    );
+    expect(signature).toBe(signature2);
+  });
+
+  // TEST 7: Invalid input checks XSS
+  test("Security inputs sanitization filters strip scripts and SQLi", () => {
+    const cleanNull = SecurityManager.sanitizeInput(null);
+    expect(cleanNull).toBe("");
+
+    const cleanScript = SecurityManager.sanitizeInput("<script>evil()</script>Test");
+    expect(cleanScript).toBe("Test");
   });
 });

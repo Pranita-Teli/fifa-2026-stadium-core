@@ -284,7 +284,7 @@
               <p class="text-[10px] text-slate-400 leading-tight" data-translate="emergency_shortcut_desc">Tap to broadcast safety coordinates</p>
             </div>
           </div>
-          <button onclick="stadiumEngine.togglePanel('sos')" role="button" aria-label="Immediately open Emergency SOS matrix setup" aria-controls="panel-sos"
+          <button onclick="stadiumEngine.transitionTo('SOS_PANEL')" role="button" aria-label="Immediately open Emergency SOS matrix setup" aria-controls="panel-sos"
                   class="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer">
             Activate
           </button>
@@ -299,7 +299,7 @@
         <h2 id="tickets-panel-heading" class="sr-only">Tickets Manager</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.transitionTo('DASHBOARD')" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -405,7 +405,7 @@
         <h2 id="stadium-panel-heading" class="sr-only">Wayfinding Routing</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.transitionTo('DASHBOARD')" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -414,10 +414,25 @@
           </span>
         </div>
 
+        <!-- Offline workspace status alerts banner -->
+        <div id="offline-simulator-alert" class="hidden bg-indigo-950 border border-indigo-500/30 p-4 rounded-3xl text-center space-y-1">
+          <p class="text-xs font-extrabold text-indigo-400 tracking-wider">📶 OFFLINE-FIRST COMPANION ACTIVE</p>
+          <p class="text-[10px] text-slate-400 leading-normal">Network loss simulated. Wayfinding utilizes localStorage predictive cache records safely.</p>
+        </div>
+
+        <!-- Predictives controls -->
         <article class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 space-y-4">
-          <div>
-            <h3 class="text-sm font-extrabold text-slate-200" data-translate="seat_section_finder">Seat Section Finder</h3>
-            <p class="text-[11px] text-slate-400" data-translate="seat_section_desc">Instantly generate the fastest gate route to avoid heavy lines.</p>
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-200" data-translate="seat_section_finder">Seat Section Finder</h3>
+              <p class="text-[11px] text-slate-400" data-translate="seat_section_desc">Instantly generate the fastest gate route to avoid heavy lines.</p>
+            </div>
+            
+            <!-- Network drops simulator toggler -->
+            <div class="flex items-center gap-1.5 bg-slate-950 border border-white/5 px-2.5 py-1.5 rounded-xl text-[10px]">
+              <input type="checkbox" id="offline-sim-checkbox" onchange="stadiumEngine.toggleOfflineModeSimulate(this.checked)" class="cursor-pointer" aria-label="Simulate offline network drop mode">
+              <label for="offline-sim-checkbox" class="text-slate-400 font-bold uppercase cursor-pointer">Offline</label>
+            </div>
           </div>
           
           <div class="flex gap-2">
@@ -483,7 +498,7 @@
         <h2 id="food-stay-panel-heading" class="sr-only">Hostel stay lodging guides</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.transitionTo('DASHBOARD')" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -533,7 +548,7 @@
         <h2 id="help-panel-heading" class="sr-only">Multilingual Assistant Support Terminal</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.transitionTo('DASHBOARD')" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -580,7 +595,7 @@
         <h2 id="sos-panel-heading" class="sr-only">Emergency safety matrix controls</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.transitionTo('DASHBOARD')" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -598,16 +613,22 @@
           </div>
 
           <!-- Pulsing Red SOS Button -->
-          <button onclick="triggerSOSPanic()" role="button" aria-label="Emergency button. Broadcast device coordinates and location metrics to pitch medics immediately" aria-controls="sos-overlay"
+          <button onclick="triggerSOSPanic()" aria-label="Emergency button. Broadcast device coordinates and location metrics to pitch medics immediately" aria-controls="sos-overlay"
                   class="w-36 h-36 rounded-full bg-gradient-to-br from-rose-500 via-red-600 to-rose-700 hover:from-rose-600 hover:to-red-800 text-white font-extrabold flex flex-col items-center justify-center shadow-lg shadow-rose-950 border-4 border-rose-400/40 cursor-pointer transition-transform duration-200 active:scale-90 select-none group pulse-glow-red">
             <span class="text-3xl group-hover:scale-110 transition-transform duration-200" aria-hidden="true">🚨</span>
             <span class="text-base font-black tracking-tighter mt-1" data-translate="sos_panic">SOS PANIC</span>
             <span class="text-[8px] text-rose-200 tracking-wider" data-translate="press_now">PRESS NOW</span>
           </button>
 
-          <div class="text-[10px] text-slate-400 space-y-0.5">
+          <div class="text-[10px] text-slate-400 space-y-1">
             <p><span data-translate="broadcast_coordinates">Current Broadcast coordinates</span>:</p>
             <p id="sos-coord-badge" class="font-extrabold text-amber-500">Sec 120, Row K (MetLife Stadium)</p>
+            
+            <!-- Cryptographic signature label badge -->
+            <div class="pt-2 border-t border-white/5 space-y-0.5">
+              <span class="text-[9px] text-slate-500 font-extrabold uppercase">SOS Cryptographic Beacon Digest:</span>
+              <code id="sos-crypto-signature" class="block text-[9px] font-black text-rose-400 tracking-wider">GENERATING...</code>
+            </div>
           </div>
         </article>
 
