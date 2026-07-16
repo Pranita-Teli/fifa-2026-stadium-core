@@ -88,7 +88,7 @@
       }
     }
 
-    /* Screen Reader Only class (WCAG helper) */
+    /* Screen Reader Helper */
     .sr-only {
       position: absolute;
       width: 1px;
@@ -133,15 +133,15 @@
           Select Language / Seleccionar Idioma / Choisir la Langue
         </label>
         <nav class="grid grid-cols-3 gap-2" aria-label="Language selection navigation">
-          <button onclick="stadiumEngine.selectGatewayLanguage('en')" id="btn-lang-en" aria-label="Change language to English" aria-controls="gateway-overlay"
+          <button onclick="stadiumEngine.selectGatewayLanguage('en')" id="btn-lang-en" role="button" aria-label="Change language to English" aria-controls="gateway-overlay"
                   class="bg-amber-500 text-slate-950 border border-amber-500 font-extrabold py-3.5 rounded-2xl text-xs transition-colors duration-200 cursor-pointer">
             🇬🇧 English
           </button>
-          <button onclick="stadiumEngine.selectGatewayLanguage('es')" id="btn-lang-es" aria-label="Cambiar idioma a Español" aria-controls="gateway-overlay"
+          <button onclick="stadiumEngine.selectGatewayLanguage('es')" id="btn-lang-es" role="button" aria-label="Cambiar idioma a Español" aria-controls="gateway-overlay"
                   class="bg-slate-950 text-slate-400 border border-white/5 hover:border-white/10 font-bold py-3.5 rounded-2xl text-xs transition-colors duration-200 cursor-pointer">
             🇪🇸 Español
           </button>
-          <button onclick="stadiumEngine.selectGatewayLanguage('fr')" id="btn-lang-fr" aria-label="Changer la langue en Français" aria-controls="gateway-overlay"
+          <button onclick="stadiumEngine.selectGatewayLanguage('fr')" id="btn-lang-fr" role="button" aria-label="Changer la langue en Français" aria-controls="gateway-overlay"
                   class="bg-slate-950 text-slate-400 border border-white/5 hover:border-white/10 font-bold py-3.5 rounded-2xl text-xs transition-colors duration-200 cursor-pointer">
             🇫🇷 Français
           </button>
@@ -158,7 +158,7 @@
                  class="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition-colors">
         </div>
 
-        <button onclick="stadiumEngine.submitFanAuth()" id="btn-sign-in" aria-label="Submit credentials to login to stadium companion dashboard" aria-controls="gateway-overlay"
+        <button onclick="stadiumEngine.submitFanAuth()" id="btn-sign-in" role="button" aria-label="Submit credentials to login to stadium companion dashboard" aria-controls="gateway-overlay"
                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-black py-4 rounded-2xl text-xs tracking-wider uppercase shadow-lg shadow-amber-500/10 active:scale-95 transition-all duration-200 cursor-pointer">
           Sign In as Fan
         </button>
@@ -234,7 +234,7 @@
           <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest" data-translate="utility_grid_title">STADIUM CONTROLS</h3>
           <div class="grid grid-cols-2 gap-3.5">
             
-            <button onclick="stadiumEngine.togglePanel('tickets')" aria-label="Open Match Tickets and purchase ledger panel" aria-controls="panel-tickets"
+            <button onclick="stadiumEngine.togglePanel('tickets')" role="button" aria-label="Open Match Tickets and purchase ledger panel" aria-controls="panel-tickets"
                     class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden cursor-pointer">
               <div class="text-2xl group-hover:scale-110 transition-transform duration-200" aria-hidden="true">🎟️</div>
               <div>
@@ -243,7 +243,7 @@
               </div>
             </button>
 
-            <button onclick="stadiumEngine.togglePanel('stadium')" aria-label="Open Stadium line checkers and routing path finder panel" aria-controls="panel-stadium"
+            <button onclick="stadiumEngine.togglePanel('stadium')" role="button" aria-label="Open Stadium line checkers and routing path finder panel" aria-controls="panel-stadium"
                     class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden cursor-pointer">
               <div class="text-2xl group-hover:scale-110 transition-transform duration-200" aria-hidden="true">🏟️</div>
               <div>
@@ -252,7 +252,7 @@
               </div>
             </button>
 
-            <button onclick="stadiumEngine.togglePanel('food-stay')" aria-label="Open Hotels, hostels and food court directory panel" aria-controls="panel-food-stay"
+            <button onclick="stadiumEngine.togglePanel('food-stay')" role="button" aria-label="Open Hotels, hostels and food court directory panel" aria-controls="panel-food-stay"
                     class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden cursor-pointer">
               <div class="text-2xl group-hover:scale-110 transition-transform duration-200" aria-hidden="true">🏨</div>
               <div>
@@ -261,7 +261,7 @@
               </div>
             </button>
 
-            <button onclick="stadiumEngine.togglePanel('help')" aria-label="Open Multilingual AI Fan safety assistant guide panel" aria-controls="panel-help"
+            <button onclick="stadiumEngine.togglePanel('help')" role="button" aria-label="Open Multilingual AI Fan safety assistant guide panel" aria-controls="panel-help"
                     class="bg-slate-900/60 border border-white/5 rounded-3xl p-5 text-left flex flex-col justify-between h-32 hover:border-amber-500/20 hover:bg-slate-900/80 active:scale-95 transition-all duration-200 shadow-md group relative overflow-hidden cursor-pointer">
               <div class="text-2xl group-hover:scale-110 transition-transform duration-200" aria-hidden="true">🤖</div>
               <div>
@@ -284,7 +284,7 @@
               <p class="text-[10px] text-slate-400 leading-tight" data-translate="emergency_shortcut_desc">Tap to broadcast safety coordinates</p>
             </div>
           </div>
-          <button onclick="stadiumEngine.togglePanel('sos')" aria-label="Immediately open Emergency SOS matrix setup" aria-controls="panel-sos"
+          <button onclick="stadiumEngine.togglePanel('sos')" role="button" aria-label="Immediately open Emergency SOS matrix setup" aria-controls="panel-sos"
                   class="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all duration-200 active:scale-95 cursor-pointer">
             Activate
           </button>
@@ -299,7 +299,7 @@
         <h2 id="tickets-panel-heading" class="sr-only">Tickets Manager</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -321,7 +321,7 @@
             <div>
               <p class="text-[9px] font-black tracking-widest text-slate-900/70 uppercase">FIFA WORLD CUP 2026</p>
               <h3 id="ticket-match-id" class="text-xl font-black tracking-tight leading-none mt-1">MATCH 14</h3>
-              <p id="ticket-match-teams" class="text-lg font-extrabold text-slate-950 leading-tight">USA vs GERMANY</p>
+              <p id="ticket-match-teams" class="text-lg font-extrabold text-slate-955 leading-tight text-slate-950">USA vs GERMANY</p>
             </div>
             <div class="text-right">
               <span class="text-[10px] font-black bg-slate-950 text-amber-400 px-2 py-0.5 rounded-md uppercase">
@@ -339,24 +339,24 @@
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="gate">GATE</p>
-                  <p id="ticket-gate" class="text-xs font-black text-slate-950">GATE C</p>
+                  <p id="ticket-gate" class="text-xs font-black text-slate-955 text-slate-950">GATE C</p>
                 </div>
                 <div>
                   <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="section">SECTION</p>
-                  <p id="ticket-section" class="text-xs font-black text-slate-950">SEC 120</p>
+                  <p id="ticket-section" class="text-xs font-black text-slate-955 text-slate-950">SEC 120</p>
                 </div>
                 <div>
                   <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="row">ROW</p>
-                  <p id="ticket-row" class="text-xs font-black text-slate-950">ROW K</p>
+                  <p id="ticket-row" class="text-xs font-black text-slate-955 text-slate-950">ROW K</p>
                 </div>
                 <div>
                   <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="seat">SEAT</p>
-                  <p id="ticket-seat" class="text-xs font-black text-slate-950">SEAT 12</p>
+                  <p id="ticket-seat" class="text-xs font-black text-slate-955 text-slate-950">SEAT 12</p>
                 </div>
               </div>
               <div class="pt-1.5">
                 <p class="text-[9px] font-bold text-slate-900/60 uppercase" data-translate="stadium_entry_time">STADIUM ENTRY TIME</p>
-                <p class="text-[10px] font-black text-slate-950">17:30 EST (Kickoff: 20:00)</p>
+                <p class="text-[10px] font-black text-slate-955 text-slate-950">17:30 EST (Kickoff: 20:00)</p>
               </div>
             </div>
             <div class="col-span-2 flex flex-col items-center justify-center">
@@ -405,7 +405,7 @@
         <h2 id="stadium-panel-heading" class="sr-only">Wayfinding Routing</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -427,7 +427,7 @@
                      class="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-colors">
               <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs" aria-hidden="true">🚶‍♂️</span>
             </div>
-            <button onclick="stadiumEngine.calculateRoute()" aria-label="Calculate directions to target seat section input" aria-controls="route-output-container"
+            <button onclick="stadiumEngine.calculateRoute()" role="button" aria-label="Calculate directions to target seat section input" aria-controls="route-output-container"
                     class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-5 py-3.5 rounded-2xl text-xs transition-all duration-200 active:scale-95 shadow-md shadow-amber-500/10 cursor-pointer" data-translate="find_route">
               Find Route
             </button>
@@ -483,7 +483,7 @@
         <h2 id="food-stay-panel-heading" class="sr-only">Hostel stay lodging guides</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -506,15 +506,15 @@
 
         <!-- Filters -->
         <div class="flex items-center p-1 bg-slate-900/60 border border-white/5 rounded-2xl gap-1">
-          <button onclick="stadiumEngine.filterVenues('all')" id="btn-filter-all" aria-label="View all listings" aria-controls="venues-list"
+          <button onclick="stadiumEngine.filterVenues('all')" id="btn-filter-all" role="button" aria-label="View all listings" aria-controls="venues-list"
                   class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-amber-500 text-slate-950 cursor-pointer">
             All Listings
           </button>
-          <button onclick="stadiumEngine.filterVenues('budget')" id="btn-filter-budget" aria-label="Filter listings for budget options below 170 dollars" aria-controls="venues-list"
+          <button onclick="stadiumEngine.filterVenues('budget')" id="btn-filter-budget" role="button" aria-label="Filter listings for budget options below 170 dollars" aria-controls="venues-list"
                   class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-400 hover:text-slate-100 cursor-pointer">
             Budget ($)
           </button>
-          <button onclick="stadiumEngine.filterVenues('luxury')" id="btn-filter-luxury" aria-label="Filter listings for luxury options above 220 dollars" aria-controls="venues-list"
+          <button onclick="stadiumEngine.filterVenues('luxury')" id="btn-filter-luxury" role="button" aria-label="Filter listings for luxury options above 220 dollars" aria-controls="venues-list"
                   class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-400 hover:text-slate-100 cursor-pointer">
             Luxury ($$$)
           </button>
@@ -533,7 +533,7 @@
         <h2 id="help-panel-heading" class="sr-only">Multilingual Assistant Support Terminal</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -564,7 +564,7 @@
             <input type="text" id="chat-user-input" placeholder="Type a question (e.g. bag policy)..." aria-required="true"
                    onkeydown="stadiumEngine.handleChatKeyDown(event)"
                    class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50">
-            <button onclick="stadiumEngine.sendChatMessage()" aria-label="Send text chat query to AI Concierge Guide" aria-controls="chat-messages-container"
+            <button onclick="stadiumEngine.sendChatMessage()" role="button" aria-label="Send text chat query to AI Concierge Guide" aria-controls="chat-messages-container"
                     class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 rounded-xl text-xs flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer" data-translate="chat_send">
               Send
             </button>
@@ -580,7 +580,7 @@
         <h2 id="sos-panel-heading" class="sr-only">Emergency safety matrix controls</h2>
         
         <div class="flex justify-between items-center">
-          <button onclick="stadiumEngine.showDashboardHome()" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
+          <button onclick="stadiumEngine.showDashboardHome()" role="button" aria-label="Return back to Dashboard home layout" aria-controls="panel-dashboard"
                   class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-white/5 px-3.5 py-2 rounded-xl cursor-pointer">
             <span data-translate="back_to_dashboard">← Back to Dashboard</span>
           </button>
@@ -598,7 +598,7 @@
           </div>
 
           <!-- Pulsing Red SOS Button -->
-          <button onclick="triggerSOSPanic()" aria-label="Emergency button. Broadcast device coordinates and location metrics to pitch medics immediately" aria-controls="sos-overlay"
+          <button onclick="triggerSOSPanic()" role="button" aria-label="Emergency button. Broadcast device coordinates and location metrics to pitch medics immediately" aria-controls="sos-overlay"
                   class="w-36 h-36 rounded-full bg-gradient-to-br from-rose-500 via-red-600 to-rose-700 hover:from-rose-600 hover:to-red-800 text-white font-extrabold flex flex-col items-center justify-center shadow-lg shadow-rose-950 border-4 border-rose-400/40 cursor-pointer transition-transform duration-200 active:scale-90 select-none group pulse-glow-red">
             <span class="text-3xl group-hover:scale-110 transition-transform duration-200" aria-hidden="true">🚨</span>
             <span class="text-base font-black tracking-tighter mt-1" data-translate="sos_panic">SOS PANIC</span>
@@ -615,7 +615,7 @@
 
     </main>
 
-    <!-- App branding footer footer semantic tag -->
+    <!-- Footer -->
     <footer class="bg-slate-900 border-t border-white/5 py-2.5 text-center text-[9px] text-slate-500 font-bold uppercase tracking-wider">
       FIFA World Cup 2026 Stadium Core • Powered by companion telemetry
     </footer>
@@ -655,7 +655,7 @@
           </div>
         </div>
       </div>
-      <button onclick="stadiumEngine.closeBookingModal()" aria-label="Close match booking confirmation modal view" aria-controls="booking-modal"
+      <button onclick="stadiumEngine.closeBookingModal()" role="button" aria-label="Close match booking confirmation modal view" aria-controls="booking-modal"
               class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3.5 rounded-2xl text-xs uppercase transition-colors duration-200 cursor-pointer" data-translate="got_it">
         Got it, view Pass
       </button>
@@ -713,7 +713,7 @@
     </div>
 
     <div class="mt-8 space-y-3.5 w-full max-w-xs">
-      <button onclick="cancelSOSPanic()" aria-label="Cancel active SOS security medical dispatch alarm call" aria-controls="sos-overlay"
+      <button onclick="cancelSOSPanic()" role="button" aria-label="Cancel active SOS security medical dispatch alarm call" aria-controls="sos-overlay"
               class="w-full bg-white text-slate-950 hover:bg-slate-200 font-extrabold py-4 rounded-2xl text-xs tracking-wider uppercase transition-colors cursor-pointer" data-translate="cancel_alarm">
         ❌ CANCEL ALARM (ACCIDENT)
       </button>
