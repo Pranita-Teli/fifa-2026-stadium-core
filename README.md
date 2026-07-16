@@ -7,7 +7,10 @@ An ultra-premium, mobile-first Single Page Application (SPA) designed to optimiz
 - **Automated Telemetry Stream Loop**: Integrates a background 15-second JavaScript interval engine that updates line queues and room vacancy variables live.
 - **Multilingual Authentication Gateway**: Includes a secure login modal that immediately translates all application fields into English, Español, or Français based on user preference.
 
-## 🛠️ Technology Stack
-- **Frontend Architecture**: Modern HTML5, Semantic JavaScript (ES6+) [1]
-- **Design Framework**: Tailwind CSS v4 Engine (Modern Browser Play CDN Compilation) [1]
-- **AI Workspace**: Google AntiGravity Workspace Core / Gemini 3.5 Flash Build Integration [1]
+## 🛠️ Technology Stack & Project Modules
+- **index.html**: Structural front-end architecture using strict W3C Semantic markups and complete WCAG 2.1 AAA accessibility tags.
+- **app.js**: High-performance, isolated ES6 operational control class managing telemetry registries.
+- **security.js**: Independent defense matrix handling automated Regular-Expression input sanitization vectors.
+- **stadium.test.js**: Complete Jest-compatible front-end module assertion unit-testing matrix.
+- **package.json & .eslintrc.json**: Full dependency managers and strict linting rule checkers.
+
